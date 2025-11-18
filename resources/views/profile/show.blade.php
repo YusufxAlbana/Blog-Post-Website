@@ -40,8 +40,27 @@
                                 id="profile-avatar"
                             >
                             <div class="flex-1">
-                                <h1 class="text-3xl font-bold text-gray-900">{{ $user->name }}</h1>
-                                <p class="text-gray-600 mt-1">{{ $user->email }}</p>
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h1 class="text-3xl font-bold text-gray-900">{{ $user->name }}</h1>
+                                        <p class="text-gray-600 mt-1">{{ $user->email }}</p>
+                                    </div>
+                                    
+                                    <!-- Follow Button -->
+                                    @auth
+                                        @if(auth()->id() !== $user->id)
+                                            <button 
+                                                onclick="toggleFollow({{ $user->id }})"
+                                                id="follow-btn-{{ $user->id }}"
+                                                class="px-4 py-2 rounded-lg font-semibold transition-colors {{ auth()->user()->isFollowing($user->id) ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' : 'bg-blue-600 text-white hover:bg-blue-700' }}"
+                                            >
+                                                <span id="follow-text-{{ $user->id }}">
+                                                    {{ auth()->user()->isFollowing($user->id) ? 'Following' : 'Follow' }}
+                                                </span>
+                                            </button>
+                                        @endif
+                                    @endauth
+                                </div>
                                 
                                 @if($user->bio)
                                     <p class="mt-4 text-gray-700">{{ $user->bio }}</p>
@@ -51,6 +70,8 @@
 
                                 <div class="mt-4 flex gap-4 text-sm text-gray-500">
                                     <span>{{ $user->posts()->where('is_published', true)->count() }} Posts</span>
+                                    <span id="followers-count-{{ $user->id }}">{{ $user->followersCount() }} Followers</span>
+                                    <span>{{ $user->followingCount() }} Following</span>
                                     <span>Joined {{ $user->created_at->format('M Y') }}</span>
                                     @if($user->role === 'admin')
                                         <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-semibold">Admin</span>
@@ -271,6 +292,64 @@
 @endif
 
 <script>
+function toggleFollow(userId) {
+    const btn = document.getElementById(`follow-btn-${userId}`);
+    const text = document.getElementById(`follow-text-${userId}`);
+    const count = document.getElementById(`followers-count-${userId}`);
+    
+    // Get current state
+    const isFollowing = btn.classList.contains('bg-gray-200');
+    
+    // Optimistic update
+    if (isFollowing) {
+        btn.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+        btn.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700');
+        text.textContent = 'Follow';
+    } else {
+        btn.classList.remove('bg-blue-600', 'text-white', 'hover:bg-blue-700');
+        btn.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+        text.textContent = 'Following';
+    }
+    
+    // Send request
+    fetch(`/users/${userId}/follow`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Update followers count
+        count.textContent = `${data.followers_count} Followers`;
+        
+        // Sync state
+        if (data.following) {
+            btn.classList.remove('bg-blue-600', 'text-white', 'hover:bg-blue-700');
+            btn.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+            text.textContent = 'Following';
+        } else {
+            btn.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+            btn.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700');
+            text.textContent = 'Follow';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Revert on error
+        if (isFollowing) {
+            btn.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+            btn.classList.remove('bg-blue-600', 'text-white', 'hover:bg-blue-700');
+            text.textContent = 'Following';
+        } else {
+            btn.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700');
+            btn.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+            text.textContent = 'Follow';
+        }
+    });
+}
+
 function toggleEditMode() {
     const viewMode = document.getElementById('view-mode');
     const editMode = document.getElementById('edit-mode');

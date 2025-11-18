@@ -9,8 +9,34 @@ Route::get('/', [PostController::class, 'index'])->name('post.index');
 Route::get('/post/{post:slug}', [PostController::class, 'show'])->name('post.show');
 Route::get('/profile/{user}', [\App\Http\Controllers\ProfileViewController::class, 'show'])->name('profile.show');
 
+// Test route for debugging likes
+Route::get('/test-like', function() {
+    $post = \App\Models\Post::first();
+    $user = \App\Models\User::find(2);
+    
+    if (!$post || !$user) {
+        return 'Post or User not found';
+    }
+    
+    // Try to create like
+    $like = \App\Models\Like::create([
+        'user_id' => $user->id,
+        'likeable_id' => $post->id,
+        'likeable_type' => get_class($post)
+    ]);
+    
+    return [
+        'like_id' => $like->id,
+        'user_id' => $like->user_id,
+        'likeable_id' => $like->likeable_id,
+        'likeable_type' => $like->likeable_type,
+        'total_likes' => $post->likes()->count()
+    ];
+});
+
+// Redirect dashboard to blog index
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return redirect()->route('post.index');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -23,8 +49,12 @@ Route::middleware('auth')->group(function () {
     // Messages for regular users
     Route::get('/messages', [\App\Http\Controllers\MessageController::class, 'index'])->name('messages.index');
     
-    // Like routes
-    Route::post('/posts/{post}/like', [\App\Http\Controllers\LikeController::class, 'togglePostLike'])->name('post.like');
+    // Follow routes
+    Route::post('/users/{user}/follow', [\App\Http\Controllers\FollowController::class, 'toggle'])->name('user.follow');
+    Route::get('/following', [\App\Http\Controllers\FollowController::class, 'following'])->name('following.index');
+    
+    // Like routes - SEPARATED (using ID not slug)
+    Route::post('/posts/{id}/like', [\App\Http\Controllers\PostLikeController::class, 'toggle'])->name('post.like')->where('id', '[0-9]+');
     Route::post('/messages/{message}/like', [\App\Http\Controllers\LikeController::class, 'toggleMessageLike'])->name('message.like');
     
     // Message management routes

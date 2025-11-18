@@ -59,7 +59,7 @@
                                 id="post-like-btn-{{ $post->id }}"
                                 class="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors {{ $post->isLikedBy(auth()->user()) ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}"
                             >
-                                <svg class="w-5 h-5 {{ $post->isLikedBy(auth()->user()) ? 'fill-current' : '' }}" fill="{{ $post->isLikedBy(auth()->user()) ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg id="post-like-icon-{{ $post->id }}" class="w-5 h-5 {{ $post->isLikedBy(auth()->user()) ? 'fill-current' : '' }}" fill="{{ $post->isLikedBy(auth()->user()) ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                                 </svg>
                                 <span id="post-likes-count-{{ $post->id }}">{{ $post->likesCount() }}</span>
@@ -112,65 +112,91 @@
 
 <script>
 function togglePostLike(postId) {
+    console.log('=== POST LIKE CLICKED (DETAIL) ===');
+    console.log('Post ID:', postId);
+    
     const btn = document.getElementById(`post-like-btn-${postId}`);
     const count = document.getElementById(`post-likes-count-${postId}`);
-    const svg = btn.querySelector('svg');
+    const icon = document.getElementById(`post-like-icon-${postId}`);
+    
+    console.log('Elements:', { btn, count, icon });
+    
+    if (!btn || !count || !icon) {
+        console.error('Missing elements!');
+        return;
+    }
     
     // Get current state
     const isLiked = btn.classList.contains('bg-red-100');
     const currentCount = parseInt(count.textContent);
     
+    console.log('Current state:', { isLiked, currentCount });
+    
     // OPTIMISTIC UPDATE - Update UI immediately
-    svg.classList.add('heart-animate');
+    icon.classList.add('heart-animate');
     
     if (isLiked) {
         // Unlike
         btn.classList.remove('bg-red-100', 'text-red-600');
         btn.classList.add('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
-        svg.setAttribute('fill', 'none');
-        svg.classList.remove('fill-current');
+        icon.setAttribute('fill', 'none');
+        icon.classList.remove('fill-current');
         count.textContent = currentCount - 1;
+        console.log('UI updated: UNLIKED');
     } else {
         // Like
         btn.classList.remove('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
         btn.classList.add('bg-red-100', 'text-red-600');
-        svg.setAttribute('fill', 'currentColor');
-        svg.classList.add('fill-current');
+        icon.setAttribute('fill', 'currentColor');
+        icon.classList.add('fill-current');
         count.textContent = currentCount + 1;
+        console.log('UI updated: LIKED');
     }
     
     // Remove animation class
-    setTimeout(() => svg.classList.remove('heart-animate'), 500);
+    setTimeout(() => icon.classList.remove('heart-animate'), 500);
     
     // Send request in background (no waiting)
-    fetch(`/posts/${postId}/like`, {
+    const url = `/posts/${postId}/like`;
+    console.log('Sending request to:', url);
+    
+    fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
-        // Sync with server response
+        console.log('✅ SUCCESS! Server response:', data);
+        // Sync with server response - ONLY update count
         count.textContent = data.likes_count;
+        console.log('Count synced to:', data.likes_count);
     })
     .catch(error => {
+        console.error('❌ ERROR:', error);
         // Revert on error
-        console.error('Error:', error);
         if (isLiked) {
             btn.classList.add('bg-red-100', 'text-red-600');
             btn.classList.remove('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
-            svg.setAttribute('fill', 'currentColor');
-            svg.classList.add('fill-current');
+            icon.setAttribute('fill', 'currentColor');
+            icon.classList.add('fill-current');
             count.textContent = currentCount;
         } else {
             btn.classList.remove('bg-red-100', 'text-red-600');
             btn.classList.add('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
-            svg.setAttribute('fill', 'none');
-            svg.classList.remove('fill-current');
+            icon.setAttribute('fill', 'none');
+            icon.classList.remove('fill-current');
             count.textContent = currentCount;
         }
+        console.log('UI reverted due to error');
     });
 }
 </script>

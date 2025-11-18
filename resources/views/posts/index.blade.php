@@ -112,16 +112,29 @@
 
 <script>
 function togglePostLikeIndex(postId) {
+    console.log('=== POST LIKE CLICKED ===');
+    console.log('Post ID:', postId);
+    
     const btn = document.getElementById(`post-like-btn-index-${postId}`);
     const count = document.getElementById(`post-likes-count-index-${postId}`);
     const icon = document.getElementById(`post-like-icon-${postId}`);
+    
+    console.log('Elements:', { btn, count, icon });
+    
+    if (!btn || !count || !icon) {
+        console.error('Missing elements!');
+        return;
+    }
     
     // Get current state
     const isLiked = btn.classList.contains('text-red-600');
     const currentCount = parseInt(count.textContent);
     
+    console.log('Current state:', { isLiked, currentCount });
+    
     // OPTIMISTIC UPDATE - Update UI immediately
-    icon.classList.add('heart-pop');
+    icon.style.transition = 'transform 0.2s ease-in-out';
+    icon.style.transform = 'scale(1.3)';
     
     if (isLiked) {
         // Unlike
@@ -130,6 +143,7 @@ function togglePostLikeIndex(postId) {
         icon.setAttribute('fill', 'none');
         icon.classList.remove('fill-current');
         count.textContent = currentCount - 1;
+        console.log('UI updated: UNLIKED');
     } else {
         // Like
         btn.classList.remove('text-gray-500', 'hover:text-red-600');
@@ -137,40 +151,39 @@ function togglePostLikeIndex(postId) {
         icon.setAttribute('fill', 'currentColor');
         icon.classList.add('fill-current');
         count.textContent = currentCount + 1;
+        console.log('UI updated: LIKED');
     }
     
-    // Remove animation class
-    setTimeout(() => icon.classList.remove('heart-pop'), 300);
+    // Reset scale
+    setTimeout(() => icon.style.transform = 'scale(1)', 200);
     
     // Send request in background (no waiting)
-    fetch(`/posts/${postId}/like`, {
+    const url = `/posts/${postId}/like`;
+    console.log('Sending request to:', url);
+    
+    fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
         }
     })
-    .then(response => response.json())
-    .then(data => {
-        // Update count with server response
-        count.textContent = data.likes_count;
-        
-        // Sync UI state with server
-        if (data.liked) {
-            btn.classList.remove('text-gray-500', 'hover:text-red-600');
-            btn.classList.add('text-red-600');
-            icon.setAttribute('fill', 'currentColor');
-            icon.classList.add('fill-current');
-        } else {
-            btn.classList.remove('text-red-600');
-            btn.classList.add('text-gray-500', 'hover:text-red-600');
-            icon.setAttribute('fill', 'none');
-            icon.classList.remove('fill-current');
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
         }
+        return response.json();
+    })
+    .then(data => {
+        console.log('✅ SUCCESS! Server response:', data);
+        // Sync with server response - ONLY update count
+        count.textContent = data.likes_count;
+        console.log('Count synced to:', data.likes_count);
     })
     .catch(error => {
+        console.error('❌ ERROR:', error);
         // Revert on error
-        console.error('Error:', error);
         if (isLiked) {
             btn.classList.add('text-red-600');
             btn.classList.remove('text-gray-500', 'hover:text-red-600');
@@ -184,6 +197,7 @@ function togglePostLikeIndex(postId) {
             icon.classList.remove('fill-current');
             count.textContent = currentCount;
         }
+        console.log('UI reverted due to error');
     });
 }
 </script>
