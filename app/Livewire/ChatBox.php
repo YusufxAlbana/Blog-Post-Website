@@ -25,6 +25,12 @@ class ChatBox extends Component
     public function mount(Post $post)
     {
         $this->post = $post;
+        
+        // Auto-fill name and email for authenticated users
+        if (auth()->check()) {
+            $this->name = auth()->user()->name;
+            $this->email = auth()->user()->email;
+        }
     }
 
     public function send()
@@ -33,31 +39,24 @@ class ChatBox extends Component
 
         $msg = Message::create([
             'post_id' => $this->post->id,
-            'name' => $this->name,
-            'email' => $this->email,
+            'user_id' => auth()->id(),
+            'name' => $this->name ?: (auth()->check() ? auth()->user()->name : 'Anonymous'),
+            'email' => $this->email ?: (auth()->check() ? auth()->user()->email : null),
             'message' => $this->message,
-            'is_moderated' => config('blog.moderate_messages', false) ? false : true,
+            'is_moderated' => true, // Auto approve for faster response
         ]);
 
-        if (config('blog.moderate_messages', false) === false) {
-            broadcast(new MessagePosted($msg));
-        }
-
-        // Send email notification
-        if (config('mail.admin_address')) {
-            Notification::route('mail', config('mail.admin_address'))
-                ->notify(new NewMessageNotification($msg));
-        }
-
+        // Clear message field immediately
         $this->reset('message');
-        $this->dispatch('messageSent');
         
-        session()->flash('message', 'Message sent successfully!');
+        // Dispatch event to clear textarea
+        $this->dispatch('message-sent');
     }
 
     public function render()
     {
-        $messages = Message::where('post_id', $this->post->id)
+        $messages = Message::with('user')
+            ->where('post_id', $this->post->id)
             ->where('is_moderated', true)
             ->latest()
             ->take(50)

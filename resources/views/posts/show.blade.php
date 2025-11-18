@@ -35,20 +35,43 @@
                 @endif
                 
                 <div class="p-6">
-                    <div class="flex items-center gap-3 mb-6">
-                        <a href="{{ route('profile.show', $post->user) }}">
-                            <img 
-                                src="{{ $post->user->avatar_url }}" 
-                                alt="{{ $post->user->name }}"
-                                class="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
-                            >
-                        </a>
-                        <div>
-                            <a href="{{ route('profile.show', $post->user) }}" class="font-semibold text-gray-900 hover:text-blue-600">
-                                {{ $post->user->name }}
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center gap-3">
+                            <a href="{{ route('profile.show', $post->user) }}">
+                                <img 
+                                    src="{{ $post->user->avatar_url }}" 
+                                    alt="{{ $post->user->name }}"
+                                    class="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+                                >
                             </a>
-                            <p class="text-sm text-gray-500">{{ $post->created_at->format('F j, Y') }}</p>
+                            <div>
+                                <a href="{{ route('profile.show', $post->user) }}" class="font-semibold text-gray-900 hover:text-blue-600">
+                                    {{ $post->user->name }}
+                                </a>
+                                <p class="text-sm text-gray-500">{{ $post->created_at->format('F j, Y') }}</p>
+                            </div>
                         </div>
+                        
+                        <!-- Like Button -->
+                        @auth
+                            <button 
+                                onclick="togglePostLike({{ $post->id }})"
+                                id="post-like-btn-{{ $post->id }}"
+                                class="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors {{ $post->isLikedBy(auth()->user()) ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}"
+                            >
+                                <svg class="w-5 h-5 {{ $post->isLikedBy(auth()->user()) ? 'fill-current' : '' }}" fill="{{ $post->isLikedBy(auth()->user()) ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                </svg>
+                                <span id="post-likes-count-{{ $post->id }}">{{ $post->likesCount() }}</span>
+                            </button>
+                        @else
+                            <div class="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-600 rounded-lg">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                </svg>
+                                <span>{{ $post->likesCount() }}</span>
+                            </div>
+                        @endauth
                     </div>
                     
                     <div class="prose max-w-none text-gray-800">
@@ -62,3 +85,92 @@
         </div>
     </div>
 </x-app-layout>
+
+
+<style>
+@keyframes heartBeat {
+    0% { transform: scale(1); }
+    25% { transform: scale(1.3); }
+    50% { transform: scale(1.1); }
+    75% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.heart-animate {
+    animation: heartBeat 0.5s ease-in-out;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.pulse-animate {
+    animation: pulse 0.3s ease-in-out;
+}
+</style>
+
+<script>
+function togglePostLike(postId) {
+    const btn = document.getElementById(`post-like-btn-${postId}`);
+    const count = document.getElementById(`post-likes-count-${postId}`);
+    const svg = btn.querySelector('svg');
+    
+    // Get current state
+    const isLiked = btn.classList.contains('bg-red-100');
+    const currentCount = parseInt(count.textContent);
+    
+    // OPTIMISTIC UPDATE - Update UI immediately
+    svg.classList.add('heart-animate');
+    
+    if (isLiked) {
+        // Unlike
+        btn.classList.remove('bg-red-100', 'text-red-600');
+        btn.classList.add('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
+        svg.setAttribute('fill', 'none');
+        svg.classList.remove('fill-current');
+        count.textContent = currentCount - 1;
+    } else {
+        // Like
+        btn.classList.remove('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
+        btn.classList.add('bg-red-100', 'text-red-600');
+        svg.setAttribute('fill', 'currentColor');
+        svg.classList.add('fill-current');
+        count.textContent = currentCount + 1;
+    }
+    
+    // Remove animation class
+    setTimeout(() => svg.classList.remove('heart-animate'), 500);
+    
+    // Send request in background (no waiting)
+    fetch(`/posts/${postId}/like`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Sync with server response
+        count.textContent = data.likes_count;
+    })
+    .catch(error => {
+        // Revert on error
+        console.error('Error:', error);
+        if (isLiked) {
+            btn.classList.add('bg-red-100', 'text-red-600');
+            btn.classList.remove('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
+            svg.setAttribute('fill', 'currentColor');
+            svg.classList.add('fill-current');
+            count.textContent = currentCount;
+        } else {
+            btn.classList.remove('bg-red-100', 'text-red-600');
+            btn.classList.add('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
+            svg.setAttribute('fill', 'none');
+            svg.classList.remove('fill-current');
+            count.textContent = currentCount;
+        }
+    });
+}
+</script>

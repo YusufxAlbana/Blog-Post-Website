@@ -46,4 +46,26 @@ class Post extends Model
         }
         return null;
     }
+
+    public function likes()
+    {
+        return $this->morphMany(Like::class, 'likeable');
+    }
+
+    public function isLikedBy($user): bool
+    {
+        if (!$user) return false;
+        return $this->likes()->where('user_id', $user->id)->exists();
+    }
+
+    public function likesCount(): int
+    {
+        return $this->likes()->count();
+    }
+
+    public function canBeLikedBy($user): bool
+    {
+        if (!$user) return false;
+        return true; // Everyone can like any post
+    }
 }

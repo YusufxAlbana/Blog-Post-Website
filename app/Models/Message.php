@@ -12,6 +12,7 @@ class Message extends Model
 
     protected $fillable = [
         'post_id',
+        'user_id',
         'name',
         'email',
         'message',
@@ -27,5 +28,26 @@ class Message extends Model
     public function post(): BelongsTo
     {
         return $this->belongsTo(Post::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function likes()
+    {
+        return $this->morphMany(Like::class, 'likeable');
+    }
+
+    public function isLikedBy($user): bool
+    {
+        if (!$user) return false;
+        return $this->likes()->where('user_id', $user->id)->exists();
+    }
+
+    public function likesCount(): int
+    {
+        return $this->likes()->count();
     }
 }

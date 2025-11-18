@@ -42,8 +42,30 @@
                                                 {{ $post->title }}
                                             </a>
                                         </h3>
-                                        <div class="text-sm text-gray-500 mb-4">
-                                            By <a href="{{ route('profile.show', $post->user) }}" class="hover:text-blue-600">{{ $post->user->name }}</a> • {{ $post->created_at->diffForHumans() }}
+                                        <div class="flex items-center gap-4 text-sm text-gray-500 mb-4">
+                                            <span>By <a href="{{ route('profile.show', $post->user) }}" class="hover:text-blue-600">{{ $post->user->name }}</a></span>
+                                            <span>{{ $post->created_at->diffForHumans() }}</span>
+                                            
+                                            <!-- Like Button -->
+                                            @auth
+                                                <button 
+                                                    onclick="togglePostLikeIndex({{ $post->id }})"
+                                                    id="post-like-btn-index-{{ $post->id }}"
+                                                    class="flex items-center gap-1 transition-colors {{ $post->isLikedBy(auth()->user()) ? 'text-red-600' : 'text-gray-500 hover:text-red-600' }}"
+                                                >
+                                                    <svg id="post-like-icon-{{ $post->id }}" class="w-4 h-4 {{ $post->isLikedBy(auth()->user()) ? 'fill-current' : '' }}" fill="{{ $post->isLikedBy(auth()->user()) ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                                    </svg>
+                                                    <span id="post-likes-count-index-{{ $post->id }}">{{ $post->likesCount() }}</span>
+                                                </button>
+                                            @else
+                                                <span class="flex items-center gap-1 text-gray-500">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                                    </svg>
+                                                    {{ $post->likesCount() }}
+                                                </span>
+                                            @endauth
                                         </div>
                                         <div class="text-gray-700 prose max-w-none">
                                             {{ Str::limit(strip_tags($post->body), 300) }}
@@ -74,3 +96,94 @@
         </div>
     </div>
 </x-app-layout>
+
+
+<style>
+@keyframes heartPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.heart-pop {
+    animation: heartPop 0.3s ease-in-out;
+}
+</style>
+
+<script>
+function togglePostLikeIndex(postId) {
+    const btn = document.getElementById(`post-like-btn-index-${postId}`);
+    const count = document.getElementById(`post-likes-count-index-${postId}`);
+    const icon = document.getElementById(`post-like-icon-${postId}`);
+    
+    // Get current state
+    const isLiked = btn.classList.contains('text-red-600');
+    const currentCount = parseInt(count.textContent);
+    
+    // OPTIMISTIC UPDATE - Update UI immediately
+    icon.classList.add('heart-pop');
+    
+    if (isLiked) {
+        // Unlike
+        btn.classList.remove('text-red-600');
+        btn.classList.add('text-gray-500', 'hover:text-red-600');
+        icon.setAttribute('fill', 'none');
+        icon.classList.remove('fill-current');
+        count.textContent = currentCount - 1;
+    } else {
+        // Like
+        btn.classList.remove('text-gray-500', 'hover:text-red-600');
+        btn.classList.add('text-red-600');
+        icon.setAttribute('fill', 'currentColor');
+        icon.classList.add('fill-current');
+        count.textContent = currentCount + 1;
+    }
+    
+    // Remove animation class
+    setTimeout(() => icon.classList.remove('heart-pop'), 300);
+    
+    // Send request in background (no waiting)
+    fetch(`/posts/${postId}/like`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Update count with server response
+        count.textContent = data.likes_count;
+        
+        // Sync UI state with server
+        if (data.liked) {
+            btn.classList.remove('text-gray-500', 'hover:text-red-600');
+            btn.classList.add('text-red-600');
+            icon.setAttribute('fill', 'currentColor');
+            icon.classList.add('fill-current');
+        } else {
+            btn.classList.remove('text-red-600');
+            btn.classList.add('text-gray-500', 'hover:text-red-600');
+            icon.setAttribute('fill', 'none');
+            icon.classList.remove('fill-current');
+        }
+    })
+    .catch(error => {
+        // Revert on error
+        console.error('Error:', error);
+        if (isLiked) {
+            btn.classList.add('text-red-600');
+            btn.classList.remove('text-gray-500', 'hover:text-red-600');
+            icon.setAttribute('fill', 'currentColor');
+            icon.classList.add('fill-current');
+            count.textContent = currentCount;
+        } else {
+            btn.classList.remove('text-red-600');
+            btn.classList.add('text-gray-500', 'hover:text-red-600');
+            icon.setAttribute('fill', 'none');
+            icon.classList.remove('fill-current');
+            count.textContent = currentCount;
+        }
+    });
+}
+</script>

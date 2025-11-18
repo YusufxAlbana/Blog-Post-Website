@@ -23,6 +23,14 @@ Route::middleware('auth')->group(function () {
     // Messages for regular users
     Route::get('/messages', [\App\Http\Controllers\MessageController::class, 'index'])->name('messages.index');
     
+    // Like routes
+    Route::post('/posts/{post}/like', [\App\Http\Controllers\LikeController::class, 'togglePostLike'])->name('post.like');
+    Route::post('/messages/{message}/like', [\App\Http\Controllers\LikeController::class, 'toggleMessageLike'])->name('message.like');
+    
+    // Message management routes
+    Route::patch('/messages/{message}', [\App\Http\Controllers\MessageManagementController::class, 'update'])->name('message.update');
+    Route::delete('/messages/{message}', [\App\Http\Controllers\MessageManagementController::class, 'destroy'])->name('message.destroy');
+    
     // Post management routes (all authenticated users)
     Route::get('/my-posts', [PostController::class, 'myPosts'])->name('post.myPosts');
     Route::get('/posts/create', [PostController::class, 'create'])->name('post.create');
