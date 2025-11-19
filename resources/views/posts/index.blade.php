@@ -29,13 +29,29 @@
                             @endif
                             <div class="flex-1 p-6">
                                 <div class="flex items-start gap-4">
-                                    <a href="{{ route('profile.show', $post->user) }}">
-                                        <img 
-                                            src="{{ $post->user->avatar_url }}" 
-                                            alt="{{ $post->user->name }}"
-                                            class="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
-                                        >
-                                    </a>
+                                    <div class="relative">
+                                        <a href="{{ route('profile.show', $post->user) }}">
+                                            <img 
+                                                src="{{ $post->user->avatar_url }}" 
+                                                alt="{{ $post->user->name }}"
+                                                class="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+                                            >
+                                        </a>
+                                        @auth
+                                            @if($post->user_id != auth()->id() && !auth()->user()->isFollowing($post->user))
+                                                <button 
+                                                    onclick="followFromAvatar({{ $post->user->id }})"
+                                                    id="follow-avatar-{{ $post->user->id }}"
+                                                    class="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-300 transform hover:scale-110"
+                                                    title="Follow {{ $post->user->name }}"
+                                                >
+                                                    <svg class="w-3 h-3 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path>
+                                                    </svg>
+                                                </button>
+                                            @endif
+                                        @endauth
+                                    </div>
                                     <div class="flex-1">
                                         <h3 class="text-2xl font-bold mb-2">
                                             <a href="{{ route('post.show', $post->slug) }}" class="text-gray-900 hover:text-blue-600">
@@ -97,6 +113,43 @@
     </div>
 </x-app-layout>
 
+<script>
+function followFromAvatar(userId) {
+    // Find ALL follow buttons for this user (in case they have multiple posts)
+    const allButtons = document.querySelectorAll(`[id^="follow-avatar-${userId}"]`);
+    
+    // Hide all buttons immediately
+    allButtons.forEach(btn => {
+        btn.style.transition = 'all 0.15s ease-out';
+        btn.style.transform = 'scale(0)';
+        btn.style.opacity = '0';
+    });
+    
+    // Send request in background
+    fetch(`/users/${userId}/follow`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Remove all buttons after animation
+        setTimeout(() => {
+            allButtons.forEach(btn => btn.remove());
+        }, 150);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Revert all buttons on error
+        allButtons.forEach(btn => {
+            btn.style.transform = 'scale(1)';
+            btn.style.opacity = '1';
+        });
+    });
+}
+</script>
 
 <style>
 @keyframes heartPop {
@@ -107,6 +160,21 @@
 
 .heart-pop {
     animation: heartPop 0.3s ease-in-out;
+}
+
+@keyframes followPulse {
+    0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    50% { 
+        transform: scale(1.1);
+        box-shadow: 0 6px 12px rgba(59, 130, 246, 0.4);
+    }
+}
+
+button[id^="follow-avatar-"]:hover {
+    animation: followPulse 0.6s ease-in-out;
 }
 </style>
 

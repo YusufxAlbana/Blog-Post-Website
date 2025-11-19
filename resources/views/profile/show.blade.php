@@ -242,6 +242,22 @@
                                         </div>
                                     </form>
                                 </div>
+
+                                <!-- Logout Section -->
+                                <div class="mt-8 pt-8 border-t border-gray-200">
+                                    <h3 class="text-lg font-semibold mb-4 text-red-600">Logout</h3>
+                                    <p class="text-gray-600 mb-4">Sign out from your account</p>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button 
+                                            type="submit" 
+                                            class="px-6 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700"
+                                            onclick="return confirm('Are you sure you want to logout?')"
+                                        >
+                                            Logout
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         @endif
                     @endauth
