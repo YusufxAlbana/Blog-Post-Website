@@ -1,23 +1,26 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Blog Posts') }}
+            <h2 class="font-bold text-2xl gradient-text" style="background: linear-gradient(135deg, var(--accent-primary), #9D4EDD); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                {{ __('Blog') }}
             </h2>
             @auth
-                <a href="{{ route('post.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                    Create New Post
+                <a href="{{ route('post.create') }}" style="background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);" class="inline-flex items-center px-4 py-2 text-white rounded-xl font-semibold transition-all" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(138, 43, 226, 0.5)'" onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 15px rgba(138, 43, 226, 0.3)'">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Create Post
                 </a>
             @endauth
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="space-y-6">
+    <div class="py-6 min-h-screen" style="background-color: var(--bg-primary);">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="space-y-4 fade-in">
                 @forelse($posts as $post)
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:bg-gray-50 transition-colors cursor-pointer" onclick="window.location='{{ route('post.show', $post->slug) }}'">
-                        <div class="p-6">
+                    <div class="overflow-hidden rounded-2xl transition-all cursor-pointer post-card" style="background: #1A1A1A; border: 1px solid rgba(138, 43, 226, 0.2);" onclick="window.location='{{ route('post.show', $post->slug) }}'">
+                        <div class="p-4">
                             <div class="flex gap-3">
                                 <!-- Avatar -->
                                 <div class="flex-shrink-0">
@@ -48,19 +51,19 @@
                                 <div class="flex-1 min-w-0">
                                     <!-- Header -->
                                     <div class="flex items-center gap-2 mb-2">
-                                        <a href="{{ route('profile.show', $post->user) }}" class="font-bold text-gray-900 hover:underline" onclick="event.stopPropagation()">
+                                        <a href="{{ route('profile.show', $post->user) }}" style="color: var(--text-primary);" class="font-bold hover:underline" onmouseover="this.style.color='var(--accent-primary)'" onmouseout="this.style.color='var(--text-primary)'" onclick="event.stopPropagation()">
                                             {{ $post->user->name }}
                                         </a>
-                                        <span class="text-gray-500">·</span>
-                                        <span class="text-gray-500 text-sm">{{ $post->created_at->diffForHumans() }}</span>
+                                        <span style="color: rgba(224, 224, 224, 0.5);">·</span>
+                                        <span style="color: rgba(224, 224, 224, 0.6);" class="text-sm">{{ $post->created_at->diffForHumans() }}</span>
                                     </div>
                                     
                                     <!-- Title & Body -->
                                     <div>
-                                        <h3 class="text-xl font-bold mb-2 text-gray-900">
+                                        <h3 class="text-xl font-bold mb-2" style="color: var(--text-primary);">
                                             {{ $post->title }}
                                         </h3>
-                                        <div class="text-gray-700 mb-3">
+                                        <div class="mb-3" style="color: rgba(224, 224, 224, 0.8);">
                                             {{ Str::limit(strip_tags($post->body), 200) }}
                                         </div>
                                     </div>
@@ -142,17 +145,26 @@
                         </div>
                     </div>
                 @empty
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-6 text-center text-gray-500">
-                            No posts yet. 
+                    <div class="overflow-hidden shadow-sm rounded-2xl" style="background: #1A1A1A; border: 1px solid rgba(138, 43, 226, 0.2);">
+                        <div class="p-12 text-center">
+                            <svg class="mx-auto h-16 w-16 mb-4" style="color: rgba(138, 43, 226, 0.5);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                            </svg>
+                            <h3 class="text-lg font-medium mb-2" style="color: #E0E0E0;">No posts yet</h3>
+                            <p class="mb-4" style="color: rgba(224, 224, 224, 0.6);">Be the first to share something!</p>
                             @auth
-                                <a href="{{ route('post.create') }}" class="text-blue-600 hover:text-blue-800">Create the first one!</a>
+                                <a href="{{ route('post.create') }}" class="inline-flex items-center px-4 py-2 text-white rounded-xl font-semibold transition-all" style="background: linear-gradient(135deg, #8A2BE2, #5A189A); box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(138, 43, 226, 0.5)'" onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 15px rgba(138, 43, 226, 0.3)'">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                    </svg>
+                                    Create Post
+                                </a>
                             @endauth
                         </div>
                     </div>
                 @endforelse
 
-                <div class="mt-6">
+                <div class="mt-6 flex justify-center">
                     {{ $posts->links() }}
                 </div>
             </div>

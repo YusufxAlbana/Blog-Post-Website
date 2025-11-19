@@ -1,10 +1,10 @@
-<div class="mt-8 bg-white rounded-lg shadow-md p-6">
-    <h3 class="text-2xl font-bold mb-4">Chat & Comments</h3>
+<div class="mt-8 rounded-lg shadow-md p-6" style="background: rgba(30, 30, 30, 0.95); border: 1px solid rgba(138, 43, 226, 0.2);">
+    <h3 class="text-2xl font-bold mb-4" style="color: #E0E0E0;">Chat & Comments</h3>
 
     <!-- Messages List -->
     <div class="mb-6 space-y-4 max-h-96 overflow-y-auto" id="messages-container">
         @forelse($messages as $msg)
-            <div class="p-4 bg-gray-50 rounded-lg">
+            <div class="p-4 rounded-lg" style="background: rgba(40, 40, 40, 0.8); border: 1px solid rgba(138, 43, 226, 0.15);">
                 <div class="flex gap-3 mb-2">
                     <!-- Avatar -->
                     @if($msg->user)
@@ -25,15 +25,15 @@
                         <div class="flex justify-between items-start">
                             <div class="flex-1">
                                 @if($msg->user)
-                                    <a href="{{ route('profile.show', $msg->user) }}" class="font-semibold text-gray-800 hover:text-blue-600">
+                                    <a href="{{ route('profile.show', $msg->user) }}" class="font-semibold transition-colors" style="color: #E0E0E0;" onmouseover="this.style.color='#8A2BE2'" onmouseout="this.style.color='#E0E0E0'">
                                         {{ $msg->user->name }}
                                     </a>
                                 @else
-                                    <span class="font-semibold text-gray-800">{{ $msg->name ?? 'Anonymous' }}</span>
+                                    <span class="font-semibold" style="color: #E0E0E0;">{{ $msg->name ?? 'Anonymous' }}</span>
                                 @endif
-                                <span class="text-sm text-gray-500 ml-2">{{ $msg->created_at->diffForHumans() }}</span>
+                                <span class="text-sm ml-2" style="color: #9CA3AF;">{{ $msg->created_at->diffForHumans() }}</span>
                                 @if($msg->created_at != $msg->updated_at)
-                                    <span class="text-xs text-gray-400 ml-1">(edited)</span>
+                                    <span class="text-xs ml-1" style="color: #6B7280;">(edited)</span>
                                 @endif
                             </div>
                     
@@ -82,25 +82,32 @@
                                 @endauth
                             </div>
                         </div>
-                        <p class="text-gray-700 mt-2" id="message-text-{{ $msg->id }}">{{ $msg->message }}</p>
+                        <p class="mt-2" style="color: #D1D5DB;" id="message-text-{{ $msg->id }}">{{ $msg->message }}</p>
                         
                         <!-- Edit Form (hidden by default) -->
                         <div id="edit-form-{{ $msg->id }}" class="hidden mt-2">
                             <textarea 
                                 id="edit-textarea-{{ $msg->id }}"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                class="w-full px-3 py-2 rounded-lg focus:ring-2 focus:outline-none"
+                                style="background: rgba(50, 50, 50, 0.8); color: #E0E0E0; border: 1px solid rgba(138, 43, 226, 0.3);"
                                 rows="3"
                             ></textarea>
                             <div class="flex gap-2 mt-2">
                                 <button 
                                     onclick="saveEdit({{ $msg->id }})"
-                                    class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                                    class="px-3 py-1 text-white text-sm rounded transition-all"
+                                    style="background: linear-gradient(135deg, #8A2BE2, #5A189A);"
+                                    onmouseover="this.style.transform='translateY(-2px)'"
+                                    onmouseout="this.style.transform=''"
                                 >
                                     Save
                                 </button>
                                 <button 
                                     onclick="cancelEdit({{ $msg->id }})"
-                                    class="px-3 py-1 bg-gray-300 text-gray-700 text-sm rounded hover:bg-gray-400"
+                                    class="px-3 py-1 text-sm rounded transition-all"
+                                    style="background: rgba(138, 43, 226, 0.1); color: #E0E0E0; border: 1px solid rgba(138, 43, 226, 0.3);"
+                                    onmouseover="this.style.background='rgba(138, 43, 226, 0.2)'"
+                                    onmouseout="this.style.background='rgba(138, 43, 226, 0.1)'"
                                 >
                                     Cancel
                                 </button>
@@ -110,33 +117,35 @@
                 </div>
             </div>
         @empty
-            <p class="text-gray-500 text-center py-4">No messages yet. Be the first to comment!</p>
+            <p class="text-center py-4" style="color: #9CA3AF;">No messages yet. Be the first to comment!</p>
         @endforelse
     </div>
 
     <!-- Message Form -->
-    <form wire:submit.prevent="send" class="space-y-4">
+    <form wire:submit.prevent="send" class="space-y-4" id="message-form" onsubmit="sendInstantMessage(event)">
         @guest
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name (optional)</label>
+                    <label for="name" class="block text-sm font-medium mb-1" style="color: #E0E0E0;">Name (optional)</label>
                     <input 
                         type="text" 
                         id="name" 
                         wire:model="name" 
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        class="w-full px-4 py-2 rounded-lg focus:ring-2 focus:outline-none"
+                        style="background: rgba(50, 50, 50, 0.8); color: #E0E0E0; border: 1px solid rgba(138, 43, 226, 0.3);"
                         placeholder="Your name"
                     >
                     @error('name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
 
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email (optional)</label>
+                    <label for="email" class="block text-sm font-medium mb-1" style="color: #E0E0E0;">Email (optional)</label>
                     <input 
                         type="email" 
                         id="email" 
                         wire:model="email" 
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        class="w-full px-4 py-2 rounded-lg focus:ring-2 focus:outline-none"
+                        style="background: rgba(50, 50, 50, 0.8); color: #E0E0E0; border: 1px solid rgba(138, 43, 226, 0.3);"
                         placeholder="your@email.com"
                     >
                     @error('email') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
@@ -145,20 +154,25 @@
         @endguest
 
         <div>
-            <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Message</label>
+            <label for="message" class="block text-sm font-medium mb-1" style="color: #E0E0E0;">Message</label>
             <textarea 
                 id="message-textarea" 
                 wire:model.defer="message" 
                 rows="4" 
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                class="w-full px-4 py-2 rounded-lg focus:ring-2 focus:outline-none"
+                style="background: rgba(50, 50, 50, 0.8); color: #E0E0E0; border: 1px solid rgba(138, 43, 226, 0.3); resize: none;"
                 placeholder="Write your message here..."
+                onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); this.closest('form').dispatchEvent(new Event('submit', {bubbles: true, cancelable: true})); }"
             ></textarea>
             @error('message') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>
 
         <button 
             type="submit" 
-            class="w-full md:w-auto px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="w-full md:w-auto px-6 py-2 text-white font-semibold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            style="background: linear-gradient(135deg, #8A2BE2, #5A189A); box-shadow: 0 0 20px rgba(138, 43, 226, 0.3);"
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 0 30px rgba(138, 43, 226, 0.5)'"
+            onmouseout="this.style.transform=''; this.style.boxShadow='0 0 20px rgba(138, 43, 226, 0.3)'"
             wire:loading.attr="disabled"
         >
             <span wire:loading.remove>Send Message</span>
@@ -175,6 +189,63 @@
 
 @script
 <script>
+    // Instant message sending
+    window.sendInstantMessage = function(event) {
+        event.preventDefault();
+        
+        const textarea = document.getElementById('message-textarea');
+        const messageText = textarea.value.trim();
+        
+        if (!messageText) return;
+        
+        // Get user info
+        const userName = '{{ auth()->check() ? auth()->user()->name : "Anonymous" }}';
+        const userAvatar = '{{ auth()->check() ? auth()->user()->avatar_url : "" }}';
+        const userId = '{{ auth()->id() ?? 0 }}';
+        
+        // Create instant message element
+        const container = document.getElementById('messages-container');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'p-4 rounded-lg';
+        messageDiv.style.cssText = 'background: rgba(40, 40, 40, 0.8); border: 1px solid rgba(138, 43, 226, 0.15); opacity: 0; transform: translateY(20px); transition: all 0.3s ease;';
+        
+        messageDiv.innerHTML = `
+            <div class="flex gap-3 mb-2">
+                ${userAvatar ? `
+                    <img src="${userAvatar}" alt="${userName}" class="w-10 h-10 rounded-full object-cover border-2 border-gray-200">
+                ` : `
+                    <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-semibold">
+                        ${userName.charAt(0)}
+                    </div>
+                `}
+                <div class="flex-1">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <span class="font-semibold" style="color: #E0E0E0;">${userName}</span>
+                            <span class="text-sm ml-2" style="color: #9CA3AF;">Just now</span>
+                        </div>
+                    </div>
+                    <p class="mt-2" style="color: #D1D5DB;">${messageText}</p>
+                </div>
+            </div>
+        `;
+        
+        // Add to top of container
+        container.insertBefore(messageDiv, container.firstChild);
+        
+        // Animate in
+        setTimeout(() => {
+            messageDiv.style.opacity = '1';
+            messageDiv.style.transform = 'translateY(0)';
+        }, 10);
+        
+        // Clear textarea immediately
+        textarea.value = '';
+        
+        // Submit to Livewire in background (no waiting)
+        $wire.send();
+    };
+    
     // Listen for message-sent event to clear textarea
     $wire.on('message-sent', () => {
         document.getElementById('message-textarea').value = '';

@@ -1,12 +1,15 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+<nav x-data="{ open: false }" class="sticky top-0 z-50 shadow-lg" style="background: rgba(26, 26, 26, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(138, 43, 226, 0.2);">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('post.index') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                    <a href="{{ route('post.index') }}" class="flex items-center gap-3">
+                        <div class="h-10 w-10 rounded-lg flex items-center justify-center transition-all" style="background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(90, 24, 154, 0.2)); border: 1px solid rgba(138, 43, 226, 0.3);" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                            <img src="{{ asset('assets/logo.png') }}" alt="Logo" class="h-8 w-8 object-contain" style="filter: drop-shadow(0 2px 8px rgba(138, 43, 226, 0.6)); mix-blend-mode: screen;">
+                        </div>
+                        <span class="text-2xl font-bold tracking-wider transition-all" style="background: linear-gradient(135deg, #8A2BE2, #DA70D6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 30px rgba(138, 43, 226, 0.5);">BLOGMOUS</span>
                     </a>
                 </div>
 
@@ -44,17 +47,18 @@
             <!-- Profile Link -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 @auth
-                    <a href="{{ route('profile.show', Auth::user()) }}" class="inline-flex items-center gap-2 px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 hover:bg-gray-50 transition ease-in-out duration-150">
+                    <a href="{{ route('profile.show', Auth::user()) }}" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg transition-all" style="color: #E0E0E0; background: rgba(138, 43, 226, 0.1);" onmouseover="this.style.background='rgba(138, 43, 226, 0.2)'" onmouseout="this.style.background='rgba(138, 43, 226, 0.1)'">
                         <img 
                             src="{{ Auth::user()->avatar_url }}" 
                             alt="{{ Auth::user()->name }}"
-                            class="w-8 h-8 rounded-full object-cover border border-gray-300"
+                            class="w-8 h-8 rounded-full object-cover transition-all"
+                            style="border: 2px solid rgba(138, 43, 226, 0.5); box-shadow: 0 0 15px rgba(138, 43, 226, 0.3);"
                         >
                         <div>{{ Auth::user()->name }}</div>
                     </a>
                 @else
-                    <a href="{{ route('login') }}" class="text-sm text-gray-700 hover:text-gray-900 mr-4">Log in</a>
-                    <a href="{{ route('register') }}" class="text-sm text-gray-700 hover:text-gray-900">Register</a>
+                    <a href="{{ route('login') }}" class="text-sm mr-4 px-4 py-2 rounded-lg transition-all" style="color: #E0E0E0;" onmouseover="this.style.color='#8A2BE2'" onmouseout="this.style.color='#E0E0E0'">Log in</a>
+                    <a href="{{ route('register') }}" class="text-sm px-4 py-2 rounded-lg transition-all" style="background: linear-gradient(135deg, #8A2BE2, #5A189A); color: white;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">Register</a>
                 @endauth
             </div>
 
