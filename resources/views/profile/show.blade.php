@@ -9,16 +9,22 @@
                     <button 
                         onclick="toggleEditMode()" 
                         id="edit-btn"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        class="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        title="Edit Profile"
                     >
-                        Edit Profile
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
                     </button>
                     <button 
                         onclick="toggleEditMode()" 
                         id="cancel-btn"
-                        class="hidden px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                        class="hidden p-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                        title="Cancel"
                     >
-                        Cancel
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
                     </button>
                 @endif
             @endauth
@@ -46,18 +52,29 @@
                                         <p class="text-gray-600 mt-1">{{ $user->email }}</p>
                                     </div>
                                     
-                                    <!-- Follow Button -->
+                                    <!-- Action Buttons -->
                                     @auth
                                         @if(auth()->id() !== $user->id)
-                                            <button 
-                                                onclick="toggleFollow({{ $user->id }})"
-                                                id="follow-btn-{{ $user->id }}"
-                                                class="px-4 py-2 rounded-lg font-semibold transition-colors {{ auth()->user()->isFollowing($user->id) ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' : 'bg-blue-600 text-white hover:bg-blue-700' }}"
-                                            >
-                                                <span id="follow-text-{{ $user->id }}">
-                                                    {{ auth()->user()->isFollowing($user->id) ? 'Following' : 'Follow' }}
-                                                </span>
-                                            </button>
+                                            <div class="flex gap-2">
+                                                <a 
+                                                    href="{{ route('dm.show', $user->id) }}"
+                                                    class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors flex items-center gap-2"
+                                                >
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                                    </svg>
+                                                    Message
+                                                </a>
+                                                <button 
+                                                    onclick="toggleFollow({{ $user->id }})"
+                                                    id="follow-btn-{{ $user->id }}"
+                                                    class="px-4 py-2 rounded-lg font-semibold transition-colors {{ auth()->user()->isFollowing($user->id) ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' : 'bg-blue-600 text-white hover:bg-blue-700' }}"
+                                                >
+                                                    <span id="follow-text-{{ $user->id }}">
+                                                        {{ auth()->user()->isFollowing($user->id) ? 'Following' : 'Follow' }}
+                                                    </span>
+                                                </button>
+                                            </div>
                                         @endif
                                     @endauth
                                 </div>

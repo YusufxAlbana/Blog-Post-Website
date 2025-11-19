@@ -13,8 +13,8 @@ class Post extends Model
 
     protected $fillable = [
         'user_id',
-        'title',
-        'body',
+        'title', // max 100 chars
+        'body', // max 10000 chars
         'slug',
         'featured_image',
         'is_published',
@@ -32,6 +32,11 @@ class Post extends Model
     public function messages(): HasMany
     {
         return $this->hasMany(Message::class);
+    }
+    
+    public function images()
+    {
+        return $this->hasMany(PostImage::class)->orderBy('order');
     }
 
     public function getRouteKeyName(): string

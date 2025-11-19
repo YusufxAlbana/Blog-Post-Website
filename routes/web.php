@@ -57,6 +57,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/posts/{id}/like', [\App\Http\Controllers\PostLikeController::class, 'toggle'])->name('post.like')->where('id', '[0-9]+');
     Route::post('/messages/{message}/like', [\App\Http\Controllers\LikeController::class, 'toggleMessageLike'])->name('message.like');
     
+    // Direct Messages (Inbox)
+    Route::get('/inbox', [\App\Http\Controllers\DirectMessageController::class, 'index'])->name('dm.index');
+    Route::get('/inbox/{user}', [\App\Http\Controllers\DirectMessageController::class, 'show'])->name('dm.show');
+    Route::post('/inbox/{user}', [\App\Http\Controllers\DirectMessageController::class, 'store'])->name('dm.store');
+    
     // Message management routes
     Route::patch('/messages/{message}', [\App\Http\Controllers\MessageManagementController::class, 'update'])->name('message.update');
     Route::delete('/messages/{message}', [\App\Http\Controllers\MessageManagementController::class, 'destroy'])->name('message.destroy');

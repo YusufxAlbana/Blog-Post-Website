@@ -16,6 +16,9 @@
                         {{ __('Blog') }}
                     </x-nav-link>
                     @auth
+                        <x-nav-link :href="route('dm.index')" :active="request()->routeIs('dm.*')">
+                            {{ __('Inbox') }}
+                        </x-nav-link>
                         <x-nav-link :href="route('following.index')" :active="request()->routeIs('following.index')">
                             {{ __('Following') }}
                         </x-nav-link>
@@ -38,33 +41,17 @@
                 </div>
             </div>
 
-            <!-- Settings Dropdown -->
+            <!-- Profile Link -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 @auth
-                    <x-dropdown align="right" width="48">
-                        <x-slot name="trigger">
-                            <button class="inline-flex items-center gap-2 px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                                <img 
-                                    src="{{ Auth::user()->avatar_url }}" 
-                                    alt="{{ Auth::user()->name }}"
-                                    class="w-8 h-8 rounded-full object-cover border border-gray-300"
-                                >
-                                <div>{{ Auth::user()->name }}</div>
-
-                                <div class="ms-1">
-                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                            </button>
-                        </x-slot>
-
-                        <x-slot name="content">
-                            <x-dropdown-link :href="route('profile.show', Auth::user())">
-                                {{ __('Profile') }}
-                            </x-dropdown-link>
-                        </x-slot>
-                    </x-dropdown>
+                    <a href="{{ route('profile.show', Auth::user()) }}" class="inline-flex items-center gap-2 px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 hover:bg-gray-50 transition ease-in-out duration-150">
+                        <img 
+                            src="{{ Auth::user()->avatar_url }}" 
+                            alt="{{ Auth::user()->name }}"
+                            class="w-8 h-8 rounded-full object-cover border border-gray-300"
+                        >
+                        <div>{{ Auth::user()->name }}</div>
+                    </a>
                 @else
                     <a href="{{ route('login') }}" class="text-sm text-gray-700 hover:text-gray-900 mr-4">Log in</a>
                     <a href="{{ route('register') }}" class="text-sm text-gray-700 hover:text-gray-900">Register</a>

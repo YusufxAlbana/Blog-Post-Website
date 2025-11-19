@@ -16,31 +16,21 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="space-y-6">
                 @forelse($posts as $post)
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="flex flex-col md:flex-row">
-                            @if($post->featured_image)
-                                <div class="md:w-1/3">
-                                    <img 
-                                        src="{{ $post->featured_image_url }}" 
-                                        alt="{{ $post->title }}"
-                                        class="w-full h-64 md:h-full object-cover"
-                                    >
-                                </div>
-                            @endif
-                            <div class="flex-1 p-6">
-                                <div class="flex items-start gap-4">
-                                    <div class="relative">
-                                        <a href="{{ route('profile.show', $post->user) }}">
-                                            <img 
-                                                src="{{ $post->user->avatar_url }}" 
-                                                alt="{{ $post->user->name }}"
-                                                class="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
-                                            >
-                                        </a>
+                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:bg-gray-50 transition-colors cursor-pointer" onclick="window.location='{{ route('post.show', $post->slug) }}'">
+                        <div class="p-6">
+                            <div class="flex gap-3">
+                                <!-- Avatar -->
+                                <div class="flex-shrink-0">
+                                    <a href="{{ route('profile.show', $post->user) }}" class="relative" onclick="event.stopPropagation()">
+                                        <img 
+                                            src="{{ $post->user->avatar_url }}" 
+                                            alt="{{ $post->user->name }}"
+                                            class="w-12 h-12 rounded-full object-cover border-2 border-gray-200 hover:border-blue-500 transition-colors"
+                                        >
                                         @auth
-                                            @if($post->user_id != auth()->id() && !auth()->user()->isFollowing($post->user))
+                                            @if($post->user_id != auth()->id() && !auth()->user()->isFollowing($post->user_id))
                                                 <button 
-                                                    onclick="followFromAvatar({{ $post->user->id }})"
+                                                    onclick="event.stopPropagation(); followFromAvatar({{ $post->user->id }})"
                                                     id="follow-avatar-{{ $post->user->id }}"
                                                     class="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-300 transform hover:scale-110"
                                                     title="Follow {{ $post->user->name }}"
@@ -51,21 +41,84 @@
                                                 </button>
                                             @endif
                                         @endauth
+                                    </a>
+                                </div>
+                                
+                                <!-- Content -->
+                                <div class="flex-1 min-w-0">
+                                    <!-- Header -->
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <a href="{{ route('profile.show', $post->user) }}" class="font-bold text-gray-900 hover:underline" onclick="event.stopPropagation()">
+                                            {{ $post->user->name }}
+                                        </a>
+                                        <span class="text-gray-500">·</span>
+                                        <span class="text-gray-500 text-sm">{{ $post->created_at->diffForHumans() }}</span>
                                     </div>
-                                    <div class="flex-1">
-                                        <h3 class="text-2xl font-bold mb-2">
-                                            <a href="{{ route('post.show', $post->slug) }}" class="text-gray-900 hover:text-blue-600">
-                                                {{ $post->title }}
-                                            </a>
+                                    
+                                    <!-- Title & Body -->
+                                    <div>
+                                        <h3 class="text-xl font-bold mb-2 text-gray-900">
+                                            {{ $post->title }}
                                         </h3>
-                                        <div class="flex items-center gap-4 text-sm text-gray-500 mb-4">
-                                            <span>By <a href="{{ route('profile.show', $post->user) }}" class="hover:text-blue-600">{{ $post->user->name }}</a></span>
-                                            <span>{{ $post->created_at->diffForHumans() }}</span>
+                                        <div class="text-gray-700 mb-3">
+                                            {{ Str::limit(strip_tags($post->body), 200) }}
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Images Carousel -->
+                                    @if($post->images->count() > 0)
+                                        <div class="mb-3 rounded-2xl overflow-hidden border border-gray-200 relative bg-black">
+                                            <div class="overflow-hidden">
+                                                <div class="flex transition-transform duration-300 ease-in-out" id="carousel-{{ $post->id }}">
+                                                    @foreach($post->images as $image)
+                                                        <div class="w-full flex-shrink-0 flex items-center justify-center" style="height: 400px;">
+                                                            <img 
+                                                                src="{{ $image->image_url }}" 
+                                                                alt="{{ $post->title }}"
+                                                                class="max-w-full max-h-full object-contain"
+                                                            >
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
                                             
-                                            <!-- Like Button -->
-                                            @auth
+                                            @if($post->images->count() > 1)
+                                                <!-- Navigation Buttons -->
+                                                <button onclick="event.stopPropagation(); prevSlide({{ $post->id }}, {{ $post->images->count() }})" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white bg-opacity-75 hover:bg-opacity-100 rounded-full p-2 shadow-lg transition-all">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                                    </svg>
+                                                </button>
+                                                <button onclick="event.stopPropagation(); nextSlide({{ $post->id }}, {{ $post->images->count() }})" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white bg-opacity-75 hover:bg-opacity-100 rounded-full p-2 shadow-lg transition-all">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                                    </svg>
+                                                </button>
+                                                
+                                                <!-- Indicators -->
+                                                <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                                                    @foreach($post->images as $index => $image)
+                                                        <div class="w-2 h-2 rounded-full bg-white transition-all {{ $index === 0 ? 'opacity-100' : 'opacity-50' }}" data-indicator-{{ $post->id }}="{{ $index }}"></div>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+                                    @endif
+                                    
+                                    <!-- Actions -->
+                                    <div class="flex items-center gap-6 text-gray-500">
+                                        <!-- Comment Count -->
+                                        <div class="flex items-center gap-1 text-gray-500">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                            </svg>
+                                            <span>{{ $post->messages()->where('is_moderated', true)->count() }}</span>
+                                        </div>
+                                        
+                                        <!-- Like Button -->
+                                        @auth
                                                 <button 
-                                                    onclick="togglePostLikeIndex({{ $post->id }})"
+                                                    onclick="event.stopPropagation(); togglePostLikeIndex({{ $post->id }})"
                                                     id="post-like-btn-index-{{ $post->id }}"
                                                     class="flex items-center gap-1 transition-colors {{ $post->isLikedBy(auth()->user()) ? 'text-red-600' : 'text-gray-500 hover:text-red-600' }}"
                                                 >
@@ -82,13 +135,7 @@
                                                     {{ $post->likesCount() }}
                                                 </span>
                                             @endauth
-                                        </div>
-                                        <div class="text-gray-700 prose max-w-none">
-                                            {{ Str::limit(strip_tags($post->body), 300) }}
-                                        </div>
-                                        <a href="{{ route('post.show', $post->slug) }}" class="inline-block mt-4 text-blue-600 hover:text-blue-800">
-                                            Read more →
-                                        </a>
+
                                     </div>
                                 </div>
                             </div>
@@ -148,6 +195,50 @@ function followFromAvatar(userId) {
             btn.style.opacity = '1';
         });
     });
+}
+
+// Carousel for blog index
+const carouselStates = {};
+
+function initCarousel(postId) {
+    if (!carouselStates[postId]) {
+        carouselStates[postId] = 0;
+    }
+}
+
+function updateCarousel(postId, totalImages) {
+    const carousel = document.getElementById(`carousel-${postId}`);
+    const indicators = document.querySelectorAll(`[data-indicator-${postId}]`);
+    
+    if (carousel) {
+        carousel.style.transform = `translateX(-${carouselStates[postId] * 100}%)`;
+        
+        indicators.forEach((indicator, index) => {
+            if (index === carouselStates[postId]) {
+                indicator.classList.remove('opacity-50');
+                indicator.classList.add('opacity-100');
+            } else {
+                indicator.classList.remove('opacity-100');
+                indicator.classList.add('opacity-50');
+            }
+        });
+    }
+}
+
+function nextSlide(postId, totalImages) {
+    initCarousel(postId);
+    if (carouselStates[postId] < totalImages - 1) {
+        carouselStates[postId]++;
+        updateCarousel(postId, totalImages);
+    }
+}
+
+function prevSlide(postId, totalImages) {
+    initCarousel(postId);
+    if (carouselStates[postId] > 0) {
+        carouselStates[postId]--;
+        updateCarousel(postId, totalImages);
+    }
 }
 </script>
 

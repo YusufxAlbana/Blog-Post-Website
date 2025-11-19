@@ -7,14 +7,18 @@
             @auth
                 @if(auth()->id() === $post->user_id || Auth::user()->isAdmin())
                     <div class="flex gap-2">
-                        <a href="{{ route('post.edit', $post->slug) }}" class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700">
-                            Edit
+                        <a href="{{ route('post.edit', $post->slug) }}" class="p-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700" title="Edit Post">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
                         </a>
                         <form action="{{ route('post.destroy', $post->slug) }}" method="POST" onsubmit="return confirm('Are you sure?')">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-                                Delete
+                            <button type="submit" class="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700" title="Delete Post">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
                             </button>
                         </form>
                     </div>
@@ -26,7 +30,45 @@
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                @if($post->featured_image)
+                @if($post->images->count() > 0)
+                    <!-- Image Gallery Carousel -->
+                    <div class="relative bg-black" id="image-gallery">
+                        <div class="overflow-hidden">
+                            <div class="flex transition-transform duration-300 ease-in-out" id="gallery-track">
+                                @foreach($post->images as $image)
+                                    <div class="w-full flex-shrink-0 flex items-center justify-center" style="min-height: 400px; max-height: 600px;">
+                                        <img 
+                                            src="{{ $image->image_url }}" 
+                                            alt="{{ $post->title }}"
+                                            class="max-w-full max-h-full object-contain"
+                                        >
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        
+                        @if($post->images->count() > 1)
+                            <!-- Navigation Buttons -->
+                            <button onclick="previousImage()" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white bg-opacity-75 hover:bg-opacity-100 rounded-full p-2 shadow-lg transition-all">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                </svg>
+                            </button>
+                            <button onclick="nextImage()" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white bg-opacity-75 hover:bg-opacity-100 rounded-full p-2 shadow-lg transition-all">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </button>
+                            
+                            <!-- Indicators -->
+                            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                                @foreach($post->images as $index => $image)
+                                    <div class="w-2 h-2 rounded-full bg-white transition-all {{ $index === 0 ? 'opacity-100' : 'opacity-50' }}" data-indicator="{{ $index }}"></div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                @elseif($post->featured_image)
                     <img 
                         src="{{ $post->featured_image_url }}" 
                         alt="{{ $post->title }}"
@@ -46,7 +88,7 @@
                                     >
                                 </a>
                                 @auth
-                                    @if($post->user_id != auth()->id() && !auth()->user()->isFollowing($post->user))
+                                    @if($post->user_id != auth()->id() && !auth()->user()->isFollowing($post->user_id))
                                         <button 
                                             onclick="followFromAvatar({{ $post->user->id }})"
                                             id="follow-avatar-{{ $post->user->id }}"
@@ -252,4 +294,50 @@ function togglePostLike(postId) {
         console.log('UI reverted due to error');
     });
 }
+</script>
+
+
+<script>
+// Image Gallery Carousel
+let currentImageIndex = 0;
+const totalImages = {{ $post->images->count() ?? 0 }};
+
+function updateGallery() {
+    const track = document.getElementById('gallery-track');
+    const indicators = document.querySelectorAll('[data-indicator]');
+    
+    if (track) {
+        track.style.transform = `translateX(-${currentImageIndex * 100}%)`;
+        
+        indicators.forEach((indicator, index) => {
+            if (index === currentImageIndex) {
+                indicator.classList.remove('opacity-50');
+                indicator.classList.add('opacity-100');
+            } else {
+                indicator.classList.remove('opacity-100');
+                indicator.classList.add('opacity-50');
+            }
+        });
+    }
+}
+
+function nextImage() {
+    if (currentImageIndex < totalImages - 1) {
+        currentImageIndex++;
+        updateGallery();
+    }
+}
+
+function previousImage() {
+    if (currentImageIndex > 0) {
+        currentImageIndex--;
+        updateGallery();
+    }
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') previousImage();
+    if (e.key === 'ArrowRight') nextImage();
+});
 </script>

@@ -35,9 +35,9 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'body' => 'required|string',
-            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'title' => 'required|string|max:100',
+            'body' => 'required|string|max:10000',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'is_published' => 'boolean',
         ]);
 
@@ -51,12 +51,19 @@ class PostController extends Controller
             $validated['slug'] = $originalSlug . '-' . $count++;
         }
 
-        // Handle featured image upload
-        if ($request->hasFile('featured_image')) {
-            $validated['featured_image'] = $request->file('featured_image')->store('posts', 'public');
+        $post = Post::create($validated);
+        
+        // Handle multiple images upload (max 10)
+        if ($request->hasFile('images')) {
+            $images = array_slice($request->file('images'), 0, 10); // Limit to 10 images
+            foreach ($images as $index => $image) {
+                $path = $image->store('post-images', 'public');
+                $post->images()->create([
+                    'image_path' => $path,
+                    'order' => $index
+                ]);
+            }
         }
-
-        Post::create($validated);
 
         return redirect()->route('post.index')->with('success', 'Post created successfully');
     }

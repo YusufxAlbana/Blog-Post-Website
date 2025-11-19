@@ -12,36 +12,36 @@
                     <form action="{{ route('post.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         
-                        <!-- Featured Image Upload -->
+                        <!-- Images Upload (1-10 images, optional) -->
                         <div class="mb-4">
-                            <label for="featured_image" class="block text-sm font-medium text-gray-700 mb-2">Featured Image</label>
-                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-400 transition-colors cursor-pointer" id="drop-zone-create">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Images (Optional, Max 10)</label>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-400 transition-colors cursor-pointer">
                                 <input 
                                     type="file" 
-                                    id="featured_image" 
-                                    name="featured_image" 
-                                    accept="image/jpeg,image/png,image/jpg,image/gif"
+                                    id="images" 
+                                    name="images[]" 
+                                    accept="image/*"
+                                    multiple
                                     class="hidden"
-                                    onchange="previewImage(event)"
+                                    onchange="previewMultipleImages(event)"
                                 >
-                                <label for="featured_image" class="cursor-pointer block text-center">
-                                    <div id="image-preview" class="hidden mb-4">
-                                        <img id="preview-img" src="" alt="Preview" class="max-h-64 mx-auto rounded-lg">
-                                    </div>
+                                <label for="images" class="cursor-pointer block text-center">
                                     <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                         <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
                                     <p class="mt-2 text-sm text-gray-600">
-                                        <span class="font-semibold text-blue-600 hover:text-blue-500">Click to upload</span> or drag and drop
+                                        <span class="font-semibold text-blue-600 hover:text-blue-500">Click to upload images</span> or drag and drop
                                     </p>
-                                    <p class="mt-1 text-xs text-gray-500">PNG, JPG, GIF up to 5MB</p>
+                                    <p class="mt-1 text-xs text-gray-500">Select 1-10 images • PNG, JPG, GIF, WebP • 5MB each</p>
                                 </label>
                             </div>
-                            @error('featured_image') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            <!-- Images Preview Grid -->
+                            <div id="images-preview-grid" class="mt-4 grid grid-cols-2 md:grid-cols-5 gap-2 hidden"></div>
+                            @error('images.*') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
                         <div class="mb-4">
-                            <label for="title" class="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                            <label for="title" class="block text-sm font-medium text-gray-700 mb-2">Title (Max 100 characters)</label>
                             <input 
                                 type="text" 
                                 id="title" 
@@ -156,4 +156,38 @@ dropZone.addEventListener('drop', (e) => {
         previewImage({ target: fileInput });
     }
 }, false);
+
+// Preview multiple images
+function previewMultipleImages(event) {
+    const files = Array.from(event.target.files).slice(0, 10); // Max 10 images
+    const grid = document.getElementById('images-preview-grid');
+    grid.innerHTML = '';
+    
+    if (files.length > 0) {
+        grid.classList.remove('hidden');
+        
+        files.forEach((file, index) => {
+            if (file.size > 5 * 1024 * 1024) {
+                alert(`Image ${index + 1} is too large. Max 5MB per image.`);
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'relative group';
+                div.innerHTML = `
+                    <img src="${e.target.result}" 
+                         class="w-full h-32 object-cover rounded-lg border-2 border-gray-200 hover:border-blue-500 transition-all"
+                         alt="Preview ${index + 1}">
+                    <div class="absolute top-1 right-1 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                        ${index + 1}
+                    </div>
+                `;
+                grid.appendChild(div);
+            }
+            reader.readAsDataURL(file);
+        });
+    }
+}
 </script>
