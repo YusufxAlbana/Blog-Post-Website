@@ -92,4 +92,29 @@ Route::middleware('auth')->group(function () {
     });
 });
 
+// API routes for followers/following
+Route::get('/api/users/{user}/followers', function(\App\Models\User $user) {
+    $followers = $user->followers()->get()->map(function($follower) {
+        return [
+            'id' => $follower->id,
+            'name' => $follower->name,
+            'bio' => $follower->bio,
+            'avatar_url' => $follower->avatar_url,
+        ];
+    });
+    return response()->json($followers);
+});
+
+Route::get('/api/users/{user}/following', function(\App\Models\User $user) {
+    $following = $user->following()->get()->map(function($followed) {
+        return [
+            'id' => $followed->id,
+            'name' => $followed->name,
+            'bio' => $followed->bio,
+            'avatar_url' => $followed->avatar_url,
+        ];
+    });
+    return response()->json($following);
+});
+
 require __DIR__.'/auth.php';

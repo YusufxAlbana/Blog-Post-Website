@@ -88,9 +88,9 @@ class PostController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'body' => 'required|string',
-            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'is_published' => 'boolean',
-            'remove_featured_image' => 'nullable|in:0,1',
+            'remove_images' => 'nullable|string',
         ]);
 
         if ($validated['title'] !== $post->title) {
@@ -103,20 +103,49 @@ class PostController extends Controller
             }
         }
 
-        // Handle featured image removal
-        if ($request->input('remove_featured_image') == '1') {
-            if ($post->featured_image) {
-                \Storage::disk('public')->delete($post->featured_image);
-                $validated['featured_image'] = null;
+        // Get current images as array
+        $currentImages = $post->images ? $post->images->pluck('image_path')->toArray() : [];
+        
+        // Handle image removal
+        if ($request->has('remove_images') && !empty($request->remove_images)) {
+            $removeImages = json_decode($request->remove_images, true);
+            
+            if (is_array($removeImages)) {
+                foreach ($removeImages as $imageData) {
+                    // Handle both string path and object format
+                    $imagePath = is_array($imageData) ? ($imageData['image_path'] ?? null) : $imageData;
+                    
+                    if ($imagePath) {
+                        // Delete from storage
+                        \Storage::disk('public')->delete($imagePath);
+                        
+                        // Delete from database
+                        $post->images()->where('image_path', $imagePath)->delete();
+                        
+                        // Remove from current array
+                        $currentImages = array_values(array_filter($currentImages, function($img) use ($imagePath) {
+                            return $img !== $imagePath;
+                        }));
+                    }
+                }
             }
         }
-        // Handle featured image upload
-        elseif ($request->hasFile('featured_image')) {
-            // Delete old image if exists
-            if ($post->featured_image) {
-                \Storage::disk('public')->delete($post->featured_image);
+
+        // Handle new images upload
+        if ($request->hasFile('images')) {
+            $order = count($currentImages); // Start order from current count
+            
+            foreach ($request->file('images') as $image) {
+                if ($order >= 10) break; // Max 10 images
+                
+                $path = $image->store('post-images', 'public');
+                
+                // Create new image record
+                $post->images()->create([
+                    'image_path' => $path,
+                    'order' => $order++
+                ]);
             }
-            $validated['featured_image'] = $request->file('featured_image')->store('posts', 'public');
         }
 
         $post->update($validated);

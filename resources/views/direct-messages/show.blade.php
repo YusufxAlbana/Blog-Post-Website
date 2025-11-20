@@ -23,6 +23,11 @@
         </div>
     </x-slot>
 
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-20 right-4 px-6 py-3 rounded-lg shadow-lg z-50" style="background: rgba(239, 68, 68, 0.95); color: white; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease;">
+        <p id="toast-message"></p>
+    </div>
+
     <div class="py-6">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="overflow-hidden shadow-sm sm:rounded-lg" style="background: rgba(30, 30, 30, 0.95); border: 1px solid rgba(138, 43, 226, 0.2);">
@@ -148,7 +153,7 @@
                             class="flex-1 px-4 py-2 rounded-full focus:ring-2 focus:outline-none resize-none"
                             style="background: rgba(50, 50, 50, 0.8); color: #E0E0E0; border: 1px solid rgba(138, 43, 226, 0.3);"
                             placeholder="Type a message..."
-                            onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"
+                            onkeydown="if(event.key === 'Enter' && !event.shiftKey && !isSending) { event.preventDefault(); sendMessage(); }"
                         ></textarea>
                         <button 
                             type="button"
@@ -237,14 +242,48 @@ function removeImage() {
     document.getElementById('image-preview').classList.add('hidden');
 }
 
+// Prevent double submit
+let isSending = false;
+
+// Show toast notification
+function showToast(message, type = 'error') {
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toast-message');
+    
+    toastMessage.textContent = message;
+    
+    // Set color based on type
+    if (type === 'success') {
+        toast.style.background = 'rgba(34, 197, 94, 0.95)';
+    } else {
+        toast.style.background = 'rgba(239, 68, 68, 0.95)';
+    }
+    
+    // Show toast
+    toast.style.opacity = '1';
+    toast.style.visibility = 'visible';
+    
+    // Auto hide after 3 seconds
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.visibility = 'hidden';
+    }, 3000);
+}
+
 // Send message with optimistic update
 function sendMessage() {
+    // Prevent double submit
+    if (isSending) return;
+    
     const input = document.getElementById('message-input');
     const imageInput = document.getElementById('image-input');
     const message = input.value.trim();
     const hasImage = imageInput.files.length > 0;
     
     if (!message && !hasImage) return;
+    
+    // Set sending flag
+    isSending = true;
     
     // Create FormData for file upload
     const formData = new FormData();
@@ -275,9 +314,27 @@ function sendMessage() {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                // Only show toast for empty message error
+                if (data.error && data.error.includes('required')) {
+                    showToast(data.error);
+                }
+                throw new Error(data.error || 'Failed to send message');
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Reset sending flag after successful send
+        isSending = false;
+    })
     .catch(error => {
         console.error('Error sending message:', error);
+        // Don't show toast for successful sends, only for actual errors
+        // Reset sending flag on error
+        isSending = false;
     });
 }
 
