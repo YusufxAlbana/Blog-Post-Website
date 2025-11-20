@@ -61,10 +61,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/inbox', [\App\Http\Controllers\DirectMessageController::class, 'index'])->name('dm.index');
     Route::get('/inbox/{user}', [\App\Http\Controllers\DirectMessageController::class, 'show'])->name('dm.show');
     Route::post('/inbox/{user}', [\App\Http\Controllers\DirectMessageController::class, 'store'])->name('dm.store');
+    Route::patch('/dm/messages/{message}', [\App\Http\Controllers\DirectMessageController::class, 'update'])->name('dm.message.update');
+    Route::delete('/dm/messages/{message}', [\App\Http\Controllers\DirectMessageController::class, 'destroy'])->name('dm.message.destroy');
     
     // Message management routes
     Route::patch('/messages/{message}', [\App\Http\Controllers\MessageManagementController::class, 'update'])->name('message.update');
     Route::delete('/messages/{message}', [\App\Http\Controllers\MessageManagementController::class, 'destroy'])->name('message.destroy');
+    
+    // Report Bug routes
+    Route::get('/reports', [\App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/create', [\App\Http\Controllers\ReportController::class, 'create'])->name('reports.create');
+    Route::post('/reports', [\App\Http\Controllers\ReportController::class, 'store'])->name('reports.store');
     
     // Post management routes (all authenticated users)
     Route::get('/my-posts', [PostController::class, 'myPosts'])->name('post.myPosts');

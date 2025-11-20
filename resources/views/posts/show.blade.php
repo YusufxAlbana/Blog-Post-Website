@@ -1,38 +1,11 @@
 <x-app-layout>
     <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
+        <div class="px-6 space-y-6">
             
-            <!-- Title Card with Edit/Delete Buttons -->
-            <div class="overflow-hidden shadow-sm sm:rounded-lg p-6" style="background: rgba(30, 30, 30, 0.95); border: 1px solid rgba(138, 43, 226, 0.2);">
-                <div class="flex justify-between items-start">
-                    <h1 class="text-3xl font-bold" style="color: #E0E0E0;">{{ $post->title }}</h1>
-                    @auth
-                        @if(auth()->id() === $post->user_id || Auth::user()->isAdmin())
-                            <div class="flex gap-2">
-                                <a href="{{ route('post.edit', $post->slug) }}" class="p-2 rounded-lg transition-all" style="background: linear-gradient(135deg, rgba(234, 179, 8, 0.3), rgba(202, 138, 4, 0.3)); color: #FCD34D; border: 1px solid rgba(234, 179, 8, 0.5); box-shadow: 0 0 15px rgba(234, 179, 8, 0.2);" onmouseover="this.style.background='linear-gradient(135deg, rgba(234, 179, 8, 0.4), rgba(202, 138, 4, 0.4))'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 0 20px rgba(234, 179, 8, 0.4)'" onmouseout="this.style.background='linear-gradient(135deg, rgba(234, 179, 8, 0.3), rgba(202, 138, 4, 0.3))'; this.style.transform=''; this.style.boxShadow='0 0 15px rgba(234, 179, 8, 0.2)'" title="Edit Post">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                    </svg>
-                                </a>
-                                <form action="{{ route('post.destroy', $post->slug) }}" method="POST" onsubmit="return confirm('Are you sure?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="p-2 rounded-lg transition-all" style="background: linear-gradient(135deg, rgba(220, 38, 38, 0.3), rgba(185, 28, 28, 0.3)); color: #FCA5A5; border: 1px solid rgba(220, 38, 38, 0.5); box-shadow: 0 0 15px rgba(220, 38, 38, 0.2);" onmouseover="this.style.background='linear-gradient(135deg, rgba(220, 38, 38, 0.4), rgba(185, 28, 28, 0.4))'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 0 20px rgba(220, 38, 38, 0.4)'" onmouseout="this.style.background='linear-gradient(135deg, rgba(220, 38, 38, 0.3), rgba(185, 28, 28, 0.3))'; this.style.transform=''; this.style.boxShadow='0 0 15px rgba(220, 38, 38, 0.2)'" title="Delete Post">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                        </svg>
-                                    </button>
-                                </form>
-                            </div>
-                        @endif
-                    @endauth
-                </div>
-            </div>
-
-            <!-- Content Card -->
+            <!-- Main Content Card -->
             <div class="overflow-hidden shadow-sm sm:rounded-lg" style="background: rgba(30, 30, 30, 0.95); border: 1px solid rgba(138, 43, 226, 0.2);">
                 <div class="p-6">
-                    <!-- Author Info & Like Button -->
+                    <!-- Author Info & Edit/Delete Buttons -->
                     <div class="flex items-center justify-between mb-6">
                         <div class="flex items-center gap-3">
                             <div class="relative">
@@ -66,7 +39,39 @@
                             </div>
                         </div>
                         
-                        <!-- Like Button -->
+                        <!-- Edit/Delete Buttons -->
+                        @auth
+                            @if(auth()->id() === $post->user_id || Auth::user()->isAdmin())
+                                <div class="flex gap-2">
+                                    <a href="{{ route('post.edit', $post->slug) }}" class="p-2 rounded-lg transition-all" style="background: linear-gradient(135deg, rgba(234, 179, 8, 0.3), rgba(202, 138, 4, 0.3)); color: #FCD34D; border: 1px solid rgba(234, 179, 8, 0.5); box-shadow: 0 0 15px rgba(234, 179, 8, 0.2);" onmouseover="this.style.background='linear-gradient(135deg, rgba(234, 179, 8, 0.4), rgba(202, 138, 4, 0.4))'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 0 20px rgba(234, 179, 8, 0.4)'" onmouseout="this.style.background='linear-gradient(135deg, rgba(234, 179, 8, 0.3), rgba(202, 138, 4, 0.3))'; this.style.transform=''; this.style.boxShadow='0 0 15px rgba(234, 179, 8, 0.2)'" title="Edit Post">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                    </a>
+                                    <form action="{{ route('post.destroy', $post->slug) }}" method="POST" onsubmit="return confirm('Are you sure?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="p-2 rounded-lg transition-all" style="background: linear-gradient(135deg, rgba(220, 38, 38, 0.3), rgba(185, 28, 28, 0.3)); color: #FCA5A5; border: 1px solid rgba(220, 38, 38, 0.5); box-shadow: 0 0 15px rgba(220, 38, 38, 0.2);" onmouseover="this.style.background='linear-gradient(135deg, rgba(220, 38, 38, 0.4), rgba(185, 28, 28, 0.4))'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 0 20px rgba(220, 38, 38, 0.4)'" onmouseout="this.style.background='linear-gradient(135deg, rgba(220, 38, 38, 0.3), rgba(185, 28, 28, 0.3))'; this.style.transform=''; this.style.boxShadow='0 0 15px rgba(220, 38, 38, 0.2)'" title="Delete Post">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            @endif
+                        @endauth
+                    </div>
+
+                    <!-- Title -->
+                    <h1 class="text-3xl font-bold mb-4" style="color: #E0E0E0;">{{ $post->title }}</h1>
+
+                    <!-- Post Body -->
+                    <div class="prose max-w-none mb-6" style="color: #E0E0E0;">
+                        {!! nl2br(e($post->body)) !!}
+                    </div>
+
+                    <!-- Like Button -->
+                    <div class="flex justify-end mb-6">
                         @auth
                             <button 
                                 onclick="togglePostLike({{ $post->id }})"
@@ -88,17 +93,12 @@
                             </div>
                         @endauth
                     </div>
-                    
-                    <!-- Post Body -->
-                    <div class="prose max-w-none mb-6" style="color: #E0E0E0;">
-                        {!! nl2br(e($post->body)) !!}
-                    </div>
                 </div>
 
                 <!-- Images Section -->
                 @if($post->images->count() > 0)
                     <!-- Image Gallery Carousel -->
-                    <div class="relative bg-black" id="image-gallery">
+                    <div class="relative rounded-lg overflow-hidden" style="background: #000; border: 2px solid rgba(138, 43, 226, 0.3);" id="image-gallery">
                         <div class="overflow-hidden">
                             <div class="flex transition-transform duration-300 ease-in-out" id="gallery-track">
                                 @foreach($post->images as $image)
@@ -115,12 +115,12 @@
                         
                         @if($post->images->count() > 1)
                             <!-- Navigation Buttons -->
-                            <button onclick="previousImage()" class="absolute left-2 top-1/2 -translate-y-1/2 rounded-full p-2 shadow-lg transition-all" style="background: rgba(138, 43, 226, 0.8); color: white;" onmouseover="this.style.background='rgba(138, 43, 226, 1)'" onmouseout="this.style.background='rgba(138, 43, 226, 0.8)'">
+                            <button onclick="previousImage()" class="absolute left-4 top-1/2 -translate-y-1/2 rounded-full p-3 shadow-lg transition-all" style="background: rgba(138, 43, 226, 0.9); color: white; border: 2px solid rgba(138, 43, 226, 0.5);" onmouseover="this.style.background='rgba(138, 43, 226, 1)'; this.style.transform='translateY(-50%) scale(1.1)'" onmouseout="this.style.background='rgba(138, 43, 226, 0.9)'; this.style.transform='translateY(-50%) scale(1)'">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                                 </svg>
                             </button>
-                            <button onclick="nextImage()" class="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2 shadow-lg transition-all" style="background: rgba(138, 43, 226, 0.8); color: white;" onmouseover="this.style.background='rgba(138, 43, 226, 1)'" onmouseout="this.style.background='rgba(138, 43, 226, 0.8)'">
+                            <button onclick="nextImage()" class="absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-3 shadow-lg transition-all" style="background: rgba(138, 43, 226, 0.9); color: white; border: 2px solid rgba(138, 43, 226, 0.5);" onmouseover="this.style.background='rgba(138, 43, 226, 1)'; this.style.transform='translateY(-50%) scale(1.1)'" onmouseout="this.style.background='rgba(138, 43, 226, 0.9)'; this.style.transform='translateY(-50%) scale(1)'">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                                 </svg>
@@ -129,7 +129,7 @@
                             <!-- Indicators -->
                             <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
                                 @foreach($post->images as $index => $image)
-                                    <div class="w-2 h-2 rounded-full bg-white transition-all {{ $index === 0 ? 'opacity-100' : 'opacity-50' }}" data-indicator="{{ $index }}"></div>
+                                    <div class="w-2 h-2 rounded-full transition-all {{ $index === 0 ? 'opacity-100' : 'opacity-50' }}" style="background: #8A2BE2;" data-indicator="{{ $index }}"></div>
                                 @endforeach
                             </div>
                         @endif

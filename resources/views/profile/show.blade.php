@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            <h2 class="font-semibold text-xl leading-tight" style="color: #E0E0E0;">
                 {{ $user->name }}'s Profile
             </h2>
             @auth
@@ -9,7 +9,10 @@
                     <button 
                         onclick="toggleEditMode()" 
                         id="edit-btn"
-                        class="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        class="p-2 text-white rounded-lg transition-all"
+                        style="background: linear-gradient(135deg, #8A2BE2, #5A189A);"
+                        onmouseover="this.style.transform='scale(1.05)'"
+                        onmouseout="this.style.transform='scale(1)'"
                         title="Edit Profile"
                     >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -19,7 +22,8 @@
                     <button 
                         onclick="toggleEditMode()" 
                         id="cancel-btn"
-                        class="hidden p-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                        class="hidden p-2 text-white rounded-lg transition-all"
+                        style="background: rgba(138, 43, 226, 0.2); color: #E0E0E0;"
                         title="Cancel"
                     >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,10 +35,10 @@
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-12" style="background-color: var(--bg-primary);">
+        <div class="px-6">
             <!-- Profile Card -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+            <div class="overflow-hidden shadow-sm sm:rounded-lg mb-6" style="background: rgba(30, 30, 30, 0.95); border: 1px solid rgba(138, 43, 226, 0.2);">
                 <div class="p-6">
                     <!-- View Mode -->
                     <div id="view-mode">
@@ -42,14 +46,15 @@
                             <img 
                                 src="{{ $user->avatar_url }}" 
                                 alt="{{ $user->name }}"
-                                class="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
+                                class="w-32 h-32 rounded-full object-cover border-4"
+                                style="border-color: rgba(138, 43, 226, 0.3);"
                                 id="profile-avatar"
                             >
                             <div class="flex-1">
                                 <div class="flex justify-between items-start">
                                     <div>
-                                        <h1 class="text-3xl font-bold text-gray-900">{{ $user->name }}</h1>
-                                        <p class="text-gray-600 mt-1">{{ $user->email }}</p>
+                                        <h1 class="text-3xl font-bold" style="color: #E0E0E0;">{{ $user->name }}</h1>
+                                        <p class="mt-1" style="color: #9CA3AF;">{{ $user->email }}</p>
                                     </div>
                                     
                                     <!-- Action Buttons -->
@@ -58,7 +63,10 @@
                                             <div class="flex gap-2">
                                                 <a 
                                                     href="{{ route('dm.show', $user->id) }}"
-                                                    class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors flex items-center gap-2"
+                                                    class="px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2"
+                                                    style="background: rgba(138, 43, 226, 0.2); color: #E0E0E0; border: 1px solid rgba(138, 43, 226, 0.3);"
+                                                    onmouseover="this.style.background='rgba(138, 43, 226, 0.3)'"
+                                                    onmouseout="this.style.background='rgba(138, 43, 226, 0.2)'"
                                                 >
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
@@ -68,7 +76,8 @@
                                                 <button 
                                                     onclick="toggleFollow({{ $user->id }})"
                                                     id="follow-btn-{{ $user->id }}"
-                                                    class="px-4 py-2 rounded-lg font-semibold transition-colors {{ auth()->user()->isFollowing($user->id) ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' : 'bg-blue-600 text-white hover:bg-blue-700' }}"
+                                                    class="px-4 py-2 rounded-lg font-semibold transition-all {{ auth()->user()->isFollowing($user->id) ? '' : '' }}"
+                                                    style="{{ auth()->user()->isFollowing($user->id) ? 'background: rgba(138, 43, 226, 0.2); color: #E0E0E0; border: 1px solid rgba(138, 43, 226, 0.3);' : 'background: linear-gradient(135deg, #8A2BE2, #5A189A); color: white;' }}"
                                                 >
                                                     <span id="follow-text-{{ $user->id }}">
                                                         {{ auth()->user()->isFollowing($user->id) ? 'Following' : 'Follow' }}
@@ -80,18 +89,18 @@
                                 </div>
                                 
                                 @if($user->bio)
-                                    <p class="mt-4 text-gray-700">{{ $user->bio }}</p>
+                                    <p class="mt-4" style="color: #B0B0B0;">{{ $user->bio }}</p>
                                 @else
-                                    <p class="mt-4 text-gray-400 italic">No bio yet</p>
+                                    <p class="mt-4 italic" style="color: #6B7280;">No bio yet</p>
                                 @endif
 
-                                <div class="mt-4 flex gap-4 text-sm text-gray-500">
+                                <div class="mt-4 flex gap-4 text-sm" style="color: #9CA3AF;">
                                     <span>{{ $user->posts()->where('is_published', true)->count() }} Posts</span>
                                     <span id="followers-count-{{ $user->id }}">{{ $user->followersCount() }} Followers</span>
                                     <span>{{ $user->followingCount() }} Following</span>
                                     <span>Joined {{ $user->created_at->format('M Y') }}</span>
                                     @if($user->role === 'admin')
-                                        <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-semibold">Admin</span>
+                                        <span class="px-2 py-1 rounded-full text-xs font-semibold" style="background: rgba(138, 43, 226, 0.2); color: #C084FC;">Admin</span>
                                     @endif
                                 </div>
                             </div>
@@ -109,20 +118,24 @@
                                     <div class="space-y-6">
                                         <!-- Avatar Upload -->
                                         <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-2">Profile Picture</label>
+                                            <label class="block text-sm font-medium mb-2" style="color: #E0E0E0;">Profile Picture</label>
                                             <div class="flex items-start gap-4">
                                                 <div class="relative">
                                                     <img 
                                                         src="{{ $user->avatar_url }}" 
                                                         alt="{{ $user->name }}"
-                                                        class="w-24 h-24 rounded-full object-cover border-4 border-gray-300 shadow-md"
+                                                        class="w-24 h-24 rounded-full object-cover border-4 shadow-md"
+                                                        style="border-color: rgba(138, 43, 226, 0.3);"
                                                         id="avatar-preview"
                                                     >
                                                     @if($user->avatar)
                                                         <button 
                                                             type="button"
                                                             onclick="removeAvatar()"
-                                                            class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 shadow-lg"
+                                                            class="absolute -top-1 -right-1 text-white rounded-full p-1 shadow-lg transition-all"
+                                                            style="background: linear-gradient(135deg, #DC2626, #991B1B);"
+                                                            onmouseover="this.style.transform='scale(1.1)'"
+                                                            onmouseout="this.style.transform='scale(1)'"
                                                             title="Remove avatar"
                                                         >
                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -132,7 +145,7 @@
                                                     @endif
                                                 </div>
                                                 <div class="flex-1">
-                                                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-400 transition-colors cursor-pointer" id="drop-zone">
+                                                    <div class="border-2 border-dashed rounded-lg p-4 transition-colors cursor-pointer" style="border-color: rgba(138, 43, 226, 0.3); background: rgba(138, 43, 226, 0.05);" id="drop-zone">
                                                         <input 
                                                             type="file" 
                                                             id="avatar" 
@@ -142,67 +155,79 @@
                                                             onchange="previewAvatar(event)"
                                                         >
                                                         <label for="avatar" class="cursor-pointer block text-center">
-                                                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                                            <svg class="mx-auto h-12 w-12" stroke="currentColor" fill="none" viewBox="0 0 48 48" style="color: #8A2BE2;">
                                                                 <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                                             </svg>
-                                                            <p class="mt-2 text-sm text-gray-600">
-                                                                <span class="font-semibold text-blue-600 hover:text-blue-500">Click to upload</span> or drag and drop
+                                                            <p class="mt-2 text-sm" style="color: #B0B0B0;">
+                                                                <span class="font-semibold" style="color: #8A2BE2;">Click to upload</span> or drag and drop
                                                             </p>
-                                                            <p class="mt-1 text-xs text-gray-500">PNG, JPG, GIF up to 2MB</p>
+                                                            <p class="mt-1 text-xs" style="color: #6B7280;">PNG, JPG, GIF up to 2MB</p>
                                                         </label>
                                                     </div>
                                                     <input type="hidden" name="remove_avatar" id="remove_avatar" value="0">
                                                 </div>
                                             </div>
-                                            @error('avatar') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                            @error('avatar') <span class="text-sm" style="color: #EF4444;">{{ $message }}</span> @enderror
                                         </div>
 
                                         <!-- Name -->
                                         <div>
-                                            <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                                            <label for="name" class="block text-sm font-medium mb-2" style="color: #E0E0E0;">Name</label>
                                             <input 
                                                 type="text" 
                                                 id="name" 
                                                 name="name" 
                                                 value="{{ old('name', $user->name) }}"
-                                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                class="w-full px-4 py-2 rounded-lg transition-all"
+                                                style="background: rgba(50, 50, 50, 0.5); border: 1px solid rgba(138, 43, 226, 0.3); color: #E0E0E0;"
+                                                onfocus="this.style.borderColor='rgba(138, 43, 226, 0.6)'; this.style.boxShadow='0 0 0 3px rgba(138, 43, 226, 0.1)'"
+                                                onblur="this.style.borderColor='rgba(138, 43, 226, 0.3)'; this.style.boxShadow='none'"
                                                 required
                                             >
-                                            @error('name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                            @error('name') <span class="text-sm" style="color: #EF4444;">{{ $message }}</span> @enderror
                                         </div>
 
                                         <!-- Bio -->
                                         <div>
-                                            <label for="bio" class="block text-sm font-medium text-gray-700 mb-2">Bio</label>
+                                            <label for="bio" class="block text-sm font-medium mb-2" style="color: #E0E0E0;">Bio</label>
                                             <textarea 
                                                 id="bio" 
                                                 name="bio" 
                                                 rows="3"
-                                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                class="w-full px-4 py-2 rounded-lg transition-all"
+                                                style="background: rgba(50, 50, 50, 0.5); border: 1px solid rgba(138, 43, 226, 0.3); color: #E0E0E0;"
+                                                onfocus="this.style.borderColor='rgba(138, 43, 226, 0.6)'; this.style.boxShadow='0 0 0 3px rgba(138, 43, 226, 0.1)'"
+                                                onblur="this.style.borderColor='rgba(138, 43, 226, 0.3)'; this.style.boxShadow='none'"
                                                 placeholder="Tell us about yourself..."
                                             >{{ old('bio', $user->bio) }}</textarea>
-                                            @error('bio') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                            @error('bio') <span class="text-sm" style="color: #EF4444;">{{ $message }}</span> @enderror
                                         </div>
 
                                         <!-- Email -->
                                         <div>
-                                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                            <label for="email" class="block text-sm font-medium mb-2" style="color: #E0E0E0;">Email</label>
                                             <input 
                                                 type="email" 
                                                 id="email" 
                                                 name="email" 
                                                 value="{{ old('email', $user->email) }}"
-                                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                class="w-full px-4 py-2 rounded-lg transition-all"
+                                                style="background: rgba(50, 50, 50, 0.5); border: 1px solid rgba(138, 43, 226, 0.3); color: #E0E0E0;"
+                                                onfocus="this.style.borderColor='rgba(138, 43, 226, 0.6)'; this.style.boxShadow='0 0 0 3px rgba(138, 43, 226, 0.1)'"
+                                                onblur="this.style.borderColor='rgba(138, 43, 226, 0.3)'; this.style.boxShadow='none'"
                                                 required
                                             >
-                                            @error('email') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                            @error('email') <span class="text-sm" style="color: #EF4444;">{{ $message }}</span> @enderror
                                         </div>
 
                                         <!-- Save Button -->
                                         <div class="flex gap-4">
                                             <button 
                                                 type="submit" 
-                                                class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
+                                                class="px-6 py-2 text-white font-semibold rounded-lg transition-all"
+                                                style="background: linear-gradient(135deg, #8A2BE2, #5A189A);"
+                                                onmouseover="this.style.transform='scale(1.05)'"
+                                                onmouseout="this.style.transform='scale(1)'"
                                             >
                                                 Save Changes
                                             </button>
@@ -282,23 +307,23 @@
             </div>
 
             <!-- User's Posts -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="overflow-hidden shadow-sm sm:rounded-lg" style="background: rgba(30, 30, 30, 0.95); border: 1px solid rgba(138, 43, 226, 0.2);">
                 <div class="p-6">
-                    <h3 class="text-xl font-semibold mb-4">Posts by {{ $user->name }}</h3>
+                    <h3 class="text-xl font-semibold mb-6" style="color: #E0E0E0;">Posts by {{ $user->name }}</h3>
                     
-                    @forelse($posts as $post)
-                        <div class="border-b pb-4 mb-4 last:border-b-0">
-                            <h4 class="text-lg font-semibold">
-                                <a href="{{ route('post.show', $post->slug) }}" class="text-gray-900 hover:text-blue-600">
+                    <div class="space-y-0">
+                        @forelse($posts as $post)
+                            <a href="{{ route('post.show', $post->slug) }}" class="block py-4 px-0 transition-all" style="border-bottom: 1px solid rgba(138, 43, 226, 0.2);" onmouseover="this.style.paddingLeft='12px'; this.style.background='rgba(138, 43, 226, 0.1)'; this.style.marginLeft='-12px'; this.style.marginRight='-12px'; this.style.paddingRight='12px';" onmouseout="this.style.paddingLeft='0'; this.style.background='transparent'; this.style.marginLeft='0'; this.style.marginRight='0'; this.style.paddingRight='0';">
+                                <h4 class="text-lg font-semibold transition-colors" style="color: #E0E0E0;">
                                     {{ $post->title }}
-                                </a>
-                            </h4>
-                            <p class="text-sm text-gray-500 mt-1">{{ $post->created_at->diffForHumans() }}</p>
-                            <p class="text-gray-700 mt-2">{{ Str::limit(strip_tags($post->body), 200) }}</p>
-                        </div>
-                    @empty
-                        <p class="text-gray-500">No posts yet.</p>
-                    @endforelse
+                                </h4>
+                                <p class="text-sm mt-1" style="color: #9CA3AF;">{{ $post->created_at->diffForHumans() }}</p>
+                                <p class="mt-2" style="color: #B0B0B0;">{{ Str::limit(strip_tags($post->body), 200) }}</p>
+                            </a>
+                        @empty
+                            <p style="color: #6B7280;">No posts yet.</p>
+                        @endforelse
+                    </div>
 
                     @if($posts->hasPages())
                         <div class="mt-6">
@@ -330,17 +355,19 @@ function toggleFollow(userId) {
     const text = document.getElementById(`follow-text-${userId}`);
     const count = document.getElementById(`followers-count-${userId}`);
     
-    // Get current state
-    const isFollowing = btn.classList.contains('bg-gray-200');
+    // Get current state by checking text content
+    const isFollowing = text.textContent.trim() === 'Following';
     
     // Optimistic update
     if (isFollowing) {
-        btn.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
-        btn.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700');
+        btn.style.background = 'linear-gradient(135deg, #8A2BE2, #5A189A)';
+        btn.style.color = 'white';
+        btn.style.border = 'none';
         text.textContent = 'Follow';
     } else {
-        btn.classList.remove('bg-blue-600', 'text-white', 'hover:bg-blue-700');
-        btn.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+        btn.style.background = 'rgba(138, 43, 226, 0.2)';
+        btn.style.color = '#E0E0E0';
+        btn.style.border = '1px solid rgba(138, 43, 226, 0.3)';
         text.textContent = 'Following';
     }
     
@@ -359,12 +386,14 @@ function toggleFollow(userId) {
         
         // Sync state
         if (data.following) {
-            btn.classList.remove('bg-blue-600', 'text-white', 'hover:bg-blue-700');
-            btn.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+            btn.style.background = 'rgba(138, 43, 226, 0.2)';
+            btn.style.color = '#E0E0E0';
+            btn.style.border = '1px solid rgba(138, 43, 226, 0.3)';
             text.textContent = 'Following';
         } else {
-            btn.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
-            btn.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700');
+            btn.style.background = 'linear-gradient(135deg, #8A2BE2, #5A189A)';
+            btn.style.color = 'white';
+            btn.style.border = 'none';
             text.textContent = 'Follow';
         }
     })
@@ -372,12 +401,14 @@ function toggleFollow(userId) {
         console.error('Error:', error);
         // Revert on error
         if (isFollowing) {
-            btn.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
-            btn.classList.remove('bg-blue-600', 'text-white', 'hover:bg-blue-700');
+            btn.style.background = 'rgba(138, 43, 226, 0.2)';
+            btn.style.color = '#E0E0E0';
+            btn.style.border = '1px solid rgba(138, 43, 226, 0.3)';
             text.textContent = 'Following';
         } else {
-            btn.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700');
-            btn.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+            btn.style.background = 'linear-gradient(135deg, #8A2BE2, #5A189A)';
+            btn.style.color = 'white';
+            btn.style.border = 'none';
             text.textContent = 'Follow';
         }
     });
@@ -453,13 +484,15 @@ if (dropZone && fileInput) {
 
     ['dragenter', 'dragover'].forEach(eventName => {
         dropZone.addEventListener(eventName, () => {
-            dropZone.classList.add('border-blue-500', 'bg-blue-50');
+            dropZone.style.borderColor = 'rgba(138, 43, 226, 0.6)';
+            dropZone.style.background = 'rgba(138, 43, 226, 0.1)';
         }, false);
     });
 
     ['dragleave', 'drop'].forEach(eventName => {
         dropZone.addEventListener(eventName, () => {
-            dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+            dropZone.style.borderColor = 'rgba(138, 43, 226, 0.3)';
+            dropZone.style.background = 'rgba(138, 43, 226, 0.05)';
         }, false);
     });
 

@@ -53,6 +53,41 @@ class ChatBox extends Component
         $this->dispatch('message-sent');
     }
 
+    public function updateMessage($messageId, $newContent)
+    {
+        $message = Message::findOrFail($messageId);
+        
+        // Check if user owns this message
+        if ($message->user_id !== auth()->id()) {
+            return;
+        }
+
+        // Validate new content is not empty
+        if (empty(trim($newContent))) {
+            return;
+        }
+
+        $message->update([
+            'message' => $newContent,
+        ]);
+
+        $this->dispatch('message-updated');
+    }
+
+    public function deleteMessage($messageId)
+    {
+        $message = Message::findOrFail($messageId);
+        
+        // Check if user owns this message
+        if ($message->user_id !== auth()->id()) {
+            return;
+        }
+
+        $message->delete();
+
+        $this->dispatch('message-deleted');
+    }
+
     public function render()
     {
         // Cache messages for faster loading

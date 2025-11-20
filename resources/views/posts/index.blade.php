@@ -16,7 +16,7 @@
     </x-slot>
 
     <div class="py-6 min-h-screen" style="background-color: var(--bg-primary);">
-        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="px-6">
             <div class="space-y-4 fade-in">
                 @forelse($posts as $post)
                     <div class="overflow-hidden rounded-2xl transition-all cursor-pointer post-card" style="background: #1A1A1A; border: 1px solid rgba(138, 43, 226, 0.2);" onclick="window.location='{{ route('post.show', $post->slug) }}'">
@@ -70,7 +70,7 @@
                                     
                                     <!-- Images Carousel -->
                                     @if($post->images->count() > 0)
-                                        <div class="mb-3 rounded-2xl overflow-hidden border border-gray-200 relative bg-black">
+                                        <div class="mb-3 rounded-2xl overflow-hidden relative bg-black" style="border: 2px solid rgba(138, 43, 226, 0.3);">
                                             <div class="overflow-hidden">
                                                 <div class="flex transition-transform duration-300 ease-in-out" id="carousel-{{ $post->id }}">
                                                     @foreach($post->images as $image)
@@ -87,12 +87,12 @@
                                             
                                             @if($post->images->count() > 1)
                                                 <!-- Navigation Buttons -->
-                                                <button onclick="event.stopPropagation(); prevSlide({{ $post->id }}, {{ $post->images->count() }})" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white bg-opacity-75 hover:bg-opacity-100 rounded-full p-2 shadow-lg transition-all">
+                                                <button onclick="event.stopPropagation(); prevSlide({{ $post->id }}, {{ $post->images->count() }})" class="absolute left-2 top-1/2 -translate-y-1/2 rounded-full p-2 shadow-lg transition-all" style="background: rgba(138, 43, 226, 0.9); color: white; border: 2px solid rgba(138, 43, 226, 0.5);" onmouseover="this.style.background='rgba(138, 43, 226, 1)'; this.style.transform='translateY(-50%) scale(1.1)'" onmouseout="this.style.background='rgba(138, 43, 226, 0.9)'; this.style.transform='translateY(-50%) scale(1)'">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                                                     </svg>
                                                 </button>
-                                                <button onclick="event.stopPropagation(); nextSlide({{ $post->id }}, {{ $post->images->count() }})" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white bg-opacity-75 hover:bg-opacity-100 rounded-full p-2 shadow-lg transition-all">
+                                                <button onclick="event.stopPropagation(); nextSlide({{ $post->id }}, {{ $post->images->count() }})" class="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2 shadow-lg transition-all" style="background: rgba(138, 43, 226, 0.9); color: white; border: 2px solid rgba(138, 43, 226, 0.5);" onmouseover="this.style.background='rgba(138, 43, 226, 1)'; this.style.transform='translateY(-50%) scale(1.1)'" onmouseout="this.style.background='rgba(138, 43, 226, 0.9)'; this.style.transform='translateY(-50%) scale(1)'">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                                                     </svg>
@@ -101,7 +101,7 @@
                                                 <!-- Indicators -->
                                                 <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
                                                     @foreach($post->images as $index => $image)
-                                                        <div class="w-2 h-2 rounded-full bg-white transition-all {{ $index === 0 ? 'opacity-100' : 'opacity-50' }}" data-indicator-{{ $post->id }}="{{ $index }}"></div>
+                                                        <div class="w-2 h-2 rounded-full transition-all {{ $index === 0 ? 'opacity-100' : 'opacity-50' }}" style="background: #8A2BE2;" data-indicator-{{ $post->id }}="{{ $index }}"></div>
                                                     @endforeach
                                                 </div>
                                             @endif

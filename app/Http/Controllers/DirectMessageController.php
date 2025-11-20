@@ -102,4 +102,42 @@ class DirectMessageController extends Controller
             'image_url' => $message->image_url
         ]);
     }
+
+    public function update(Request $request, DirectMessage $message)
+    {
+        // Check if user owns this message
+        if ($message->sender_id !== auth()->id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $request->validate([
+            'message' => 'nullable|string|max:2000'
+        ]);
+
+        // Only update if message text is provided
+        if ($request->has('message')) {
+            $message->update([
+                'message' => $request->message
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => $message->message
+        ]);
+    }
+
+    public function destroy(DirectMessage $message)
+    {
+        // Check if user owns this message
+        if ($message->sender_id !== auth()->id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $message->delete();
+
+        return response()->json([
+            'success' => true
+        ]);
+    }
 }

@@ -57,19 +57,22 @@
         <div class="min-h-screen" style="background-color: var(--bg-primary)">
             @include('layouts.navigation')
 
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="shadow-lg" style="background: rgba(26, 26, 26, 0.95); border-bottom: 1px solid rgba(138, 43, 226, 0.2);">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endisset
+            <!-- Main Content with Sidebar Offset -->
+            <div class="lg:pl-64">
+                <!-- Page Heading -->
+                @isset($header)
+                    <header style="background: rgba(26, 26, 26, 0.95); border-bottom: 1px solid rgba(138, 43, 226, 0.2);">
+                        <div class="py-6 px-6">
+                            {{ $header }}
+                        </div>
+                    </header>
+                @endisset
 
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
+                <!-- Page Content -->
+                <main>
+                    {{ $slot }}
+                </main>
+            </div>
         </div>
     </body>
 </html>

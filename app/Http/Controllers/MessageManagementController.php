@@ -15,12 +15,15 @@ class MessageManagementController extends Controller
         }
 
         $request->validate([
-            'message' => 'required|string|max:2000'
+            'message' => 'nullable|string|max:2000'
         ]);
 
-        $message->update([
-            'message' => $request->message
-        ]);
+        // Only update if message is provided
+        if ($request->has('message')) {
+            $message->update([
+                'message' => $request->message
+            ]);
+        }
 
         return response()->json([
             'success' => true,
