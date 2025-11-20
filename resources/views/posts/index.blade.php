@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-0 min-h-screen" style="background-color: var(--bg-primary);">
         <!-- Sticky Navbar with Tabs and Search -->
-        <div class="sticky top-0 z-40 navbar-tabs" style="background: rgba(13, 13, 13, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(138, 43, 226, 0.2); transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;">
+        <div class="sticky top-0 z-40" style="background: rgba(13, 13, 13, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(138, 43, 226, 0.2);">
             <div class="flex gap-6 px-6">
                 <!-- Tabs (Left) -->
                 <div class="flex-1 max-w-2xl">
@@ -90,9 +90,10 @@
             </div>
 
             <!-- Right Sidebar -->
-            <div class="w-80 flex-shrink-0 py-4">
-                <!-- Most Liked Posts -->
-                <div class="rounded-2xl p-4" style="background: rgba(26, 26, 26, 0.8); border: 1px solid rgba(138, 43, 226, 0.2);">
+            <div class="w-80 flex-shrink-0">
+                <div class="sticky top-20 py-4">
+                    <!-- Most Liked Posts -->
+                    <div class="rounded-2xl p-4" style="background: rgba(26, 26, 26, 0.8); border: 1px solid rgba(138, 43, 226, 0.2);">
                     <div class="flex items-center gap-2 mb-4">
                         <svg class="w-5 h-5" style="color: #8A2BE2;" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>
@@ -121,7 +122,7 @@
                                             <svg class="w-3 h-3 fill-current text-red-500" viewBox="0 0 24 24">
                                                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>
                                             </svg>
-                                            <span>{{ $post->likes_count }} likes</span>
+                                            <span>{{ $post->likes_count }} {{ $post->likes_count == 1 ? 'like' : 'likes' }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -131,6 +132,7 @@
                         @endforelse
                     </div>
                 </div>
+            </div>
             </div>
         </div>
     </div>
@@ -162,48 +164,11 @@
                 }
             });
         }
-
-        // Navbar hide/show on scroll
-        let lastScrollTop = 0;
-        let scrollThreshold = 10;
-        
-        window.addEventListener('scroll', function() {
-            const navbar = document.querySelector('.navbar-tabs');
-            if (!navbar) return;
-            
-            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            
-            // If at top of page, always show navbar
-            if (scrollTop <= 10) {
-                navbar.style.transform = 'translateY(0)';
-                navbar.style.opacity = '1';
-                lastScrollTop = scrollTop;
-                return;
-            }
-            
-            // Check scroll direction
-            if (scrollTop > lastScrollTop + 5 && scrollTop > scrollThreshold) {
-                // Scrolling down - hide navbar
-                navbar.style.transform = 'translateY(-100%)';
-                navbar.style.opacity = '0';
-            } else if (scrollTop < lastScrollTop - 5) {
-                // Scrolling up - show navbar
-                navbar.style.transform = 'translateY(0)';
-                navbar.style.opacity = '1';
-            }
-            
-            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
-        }, false);
     </script>
 
     <style>
         .tab-button:hover {
             background: rgba(138, 43, 226, 0.05);
-        }
-        
-        .navbar-tabs {
-            transform: translateY(0);
-            opacity: 1;
         }
     </style>
 </x-app-layout>
