@@ -12,20 +12,50 @@ class PostController extends Controller
     {
         $search = $request->input('search');
         
+        // All posts for "For you" tab
         $posts = Post::where('is_published', true)
-            ->with('user')
+            ->with(['user', 'images', 'likes'])
             ->when($search, function($query) use ($search) {
                 $query->where(function($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")
+                      ->orWhere('body', 'like', "%{$search}%")
                       ->orWhereHas('user', function($userQuery) use ($search) {
                           $userQuery->where('name', 'like', "%{$search}%");
                       });
                 });
             })
             ->latest()
-            ->paginate(10);
+            ->get();
 
-        return view('posts.index', compact('posts', 'search'));
+        // Posts from people you follow for "Following" tab
+        $followingPosts = collect();
+        if (auth()->check()) {
+            $followingIds = auth()->user()->following()->pluck('users.id');
+            $followingPosts = Post::whereIn('user_id', $followingIds)
+                ->where('is_published', true)
+                ->with(['user', 'images', 'likes'])
+                ->when($search, function($query) use ($search) {
+                    $query->where(function($q) use ($search) {
+                        $q->where('title', 'like', "%{$search}%")
+                          ->orWhere('body', 'like', "%{$search}%")
+                          ->orWhereHas('user', function($userQuery) use ($search) {
+                              $userQuery->where('name', 'like', "%{$search}%");
+                          });
+                    });
+                })
+                ->latest()
+                ->get();
+        }
+
+        // Most liked posts
+        $mostLikedPosts = Post::where('is_published', true)
+            ->with(['user', 'likes'])
+            ->withCount('likes')
+            ->orderBy('likes_count', 'desc')
+            ->take(5)
+            ->get();
+
+        return view('posts.index', compact('posts', 'followingPosts', 'mostLikedPosts', 'search'));
     }
 
     public function show(Post $post)

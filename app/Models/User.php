@@ -118,4 +118,30 @@ class User extends Authenticatable
                     ->where('follower_id', $this->id);
             });
     }
+
+    // Anonymous mode helper
+    public function isAnonymous(): bool
+    {
+        return $this->email === 'anonymous@system.local';
+    }
+
+    public function canBeInvitedToGroup(): bool
+    {
+        return !$this->isAnonymous();
+    }
+
+    public function canReceiveMessages(): bool
+    {
+        return !$this->isAnonymous();
+    }
+
+    public function canBeFollowed(): bool
+    {
+        return !$this->isAnonymous();
+    }
+
+    public function canViewProfile(): bool
+    {
+        return !$this->isAnonymous();
+    }
 }

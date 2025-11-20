@@ -1,52 +1,297 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
-
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
-        </div>
-
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
-
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar - BLOGMOUS</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        body {
+            background: #0a0a0a;
+            color: #E0E0E0;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #8A2BE2, #9D4EDD);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .input-field {
+            background: #1a1a1a !important;
+            border: 1px solid #8A2BE2;
+            color: #E0E0E0 !important;
+            transition: all 0.3s ease;
+            -webkit-text-fill-color: #E0E0E0 !important;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #8A2BE2;
+            background: #1a1a1a !important;
+            box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.2);
+        }
+        .input-field::placeholder {
+            color: #4B5563;
+            opacity: 0.6;
+        }
+        .input-field:-webkit-autofill,
+        .input-field:-webkit-autofill:hover,
+        .input-field:-webkit-autofill:focus,
+        .input-field:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px #1a1a1a inset !important;
+            -webkit-text-fill-color: #E0E0E0 !important;
+            box-shadow: 0 0 0 30px #1a1a1a inset !important;
+            border: 1px solid #8A2BE2 !important;
+        }
+        input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #1a1a1a !important;
+            border: 2px solid #8A2BE2 !important;
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        input[type="checkbox"]:checked {
+            background: #8A2BE2 !important;
+            border-color: #8A2BE2 !important;
+        }
+        input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        input[type="checkbox"]:focus {
+            outline: none !important;
+            box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.2) !important;
+            border-color: #8A2BE2 !important;
+        }
+        .auth-card {
+            background: rgba(26, 26, 26, 0.95);
+            border: 1px solid rgba(138, 43, 226, 0.2);
+            box-shadow: 0 8px 32px rgba(138, 43, 226, 0.2);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        .password-strength {
+            height: 4px;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <!-- Background Pattern -->
+    <div class="fixed inset-0 opacity-10" style="background-image: radial-gradient(circle at 2px 2px, rgba(138, 43, 226, 0.3) 1px, transparent 0); background-size: 40px 40px;"></div>
+    
+    <div class="w-full max-w-md relative z-10 fade-in">
+        <!-- Logo -->
+        <div class="text-center mb-8">
+            <a href="{{ route('welcome') }}" class="inline-flex items-center gap-3 mb-4">
+                <div class="h-12 w-12 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(90, 24, 154, 0.2)); border: 1px solid rgba(138, 43, 226, 0.3);">
+                    <img src="{{ asset('assets/logo.png') }}" alt="Logo" class="h-10 w-10 object-contain" style="filter: drop-shadow(0 2px 8px rgba(138, 43, 226, 0.6));">
+                </div>
+                <span class="text-3xl font-bold gradient-text">BLOGMOUS</span>
             </a>
-
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
+            <h1 class="text-2xl font-bold mb-2">Buat Akun Baru</h1>
+            <p style="color: #9CA3AF;">Bergabunglah dengan ribuan penulis lainnya</p>
         </div>
-    </form>
-</x-guest-layout>
+
+        <!-- Register Card -->
+        <div class="auth-card rounded-2xl p-8">
+            <form method="POST" action="{{ route('register') }}" id="registerForm">
+                @csrf
+
+                <!-- Name -->
+                <div class="mb-6">
+                    <label for="name" class="block text-sm font-semibold mb-2" style="color: #E0E0E0;">
+                        Nama Lengkap
+                    </label>
+                    <input 
+                        id="name" 
+                        type="text" 
+                        name="name" 
+                        value="{{ old('name') }}" 
+                        required 
+                        autofocus 
+                        autocomplete="name"
+                        class="input-field w-full px-4 py-3 rounded-lg"
+                        placeholder="John Doe"
+                    />
+                    @error('name')
+                        <p class="mt-2 text-sm" style="color: #ef4444;">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Email Address -->
+                <div class="mb-6">
+                    <label for="email" class="block text-sm font-semibold mb-2" style="color: #E0E0E0;">
+                        Email
+                    </label>
+                    <input 
+                        id="email" 
+                        type="email" 
+                        name="email" 
+                        value="{{ old('email') }}" 
+                        required 
+                        autocomplete="username"
+                        class="input-field w-full px-4 py-3 rounded-lg"
+                        placeholder="nama@email.com"
+                    />
+                    @error('email')
+                        <p class="mt-2 text-sm" style="color: #ef4444;">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Password -->
+                <div class="mb-6">
+                    <label for="password" class="block text-sm font-semibold mb-2" style="color: #E0E0E0;">
+                        Password
+                    </label>
+                    <input 
+                        id="password" 
+                        type="password" 
+                        name="password" 
+                        required 
+                        autocomplete="new-password"
+                        class="input-field w-full px-4 py-3 rounded-lg"
+                        placeholder="Minimal 8 karakter"
+                    />
+                    <!-- Password Strength Indicator -->
+                    <div class="mt-2">
+                        <div class="password-strength" id="passwordStrength" style="background: rgba(138, 43, 226, 0.2); width: 0%;"></div>
+                        <p class="text-xs mt-1" id="passwordStrengthText" style="color: #9CA3AF;">Gunakan kombinasi huruf, angka, dan simbol</p>
+                    </div>
+                    @error('password')
+                        <p class="mt-2 text-sm" style="color: #ef4444;">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="mb-6">
+                    <label for="password_confirmation" class="block text-sm font-semibold mb-2" style="color: #E0E0E0;">
+                        Konfirmasi Password
+                    </label>
+                    <input 
+                        id="password_confirmation" 
+                        type="password" 
+                        name="password_confirmation" 
+                        required 
+                        autocomplete="new-password"
+                        class="input-field w-full px-4 py-3 rounded-lg"
+                        placeholder="Ketik ulang password"
+                    />
+                    @error('password_confirmation')
+                        <p class="mt-2 text-sm" style="color: #ef4444;">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Terms -->
+                <div class="mb-6">
+                    <label class="inline-flex items-start cursor-pointer">
+                        <input 
+                            type="checkbox" 
+                            required
+                            class="rounded mt-1"
+                        >
+                        <span class="ml-2 text-sm" style="color: #9CA3AF;">
+                            Saya setuju dengan <a href="#" class="text-purple-500 hover:text-purple-400">Syarat & Ketentuan</a> dan <a href="#" class="text-purple-500 hover:text-purple-400">Kebijakan Privasi</a>
+                        </span>
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <button 
+                    type="submit" 
+                    class="w-full py-3 rounded-lg font-semibold transition-all"
+                    style="background: linear-gradient(135deg, #8A2BE2, #5A189A); color: white; box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);"
+                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(138, 43, 226, 0.5)'"
+                    onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 15px rgba(138, 43, 226, 0.3)'"
+                >
+                    Daftar Sekarang
+                </button>
+            </form>
+
+            <!-- Divider -->
+            <div class="relative my-6">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t" style="border-color: rgba(138, 43, 226, 0.2);"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-4" style="background: rgba(26, 26, 26, 0.95); color: #9CA3AF;">
+                        Sudah punya akun?
+                    </span>
+                </div>
+            </div>
+
+            <!-- Login Link -->
+            <a 
+                href="{{ route('login') }}" 
+                class="block w-full py-3 rounded-lg font-semibold text-center transition-all"
+                style="border: 2px solid rgba(138, 43, 226, 0.5); color: #E0E0E0;"
+                onmouseover="this.style.background='rgba(138, 43, 226, 0.1)'"
+                onmouseout="this.style.background=''"
+            >
+                Masuk
+            </a>
+        </div>
+
+        <!-- Back to Home -->
+        <div class="text-center mt-6">
+            <a href="{{ route('welcome') }}" class="text-sm transition-colors" style="color: #9CA3AF;" onmouseover="this.style.color='#E0E0E0'" onmouseout="this.style.color='#9CA3AF'">
+                ← Kembali ke Beranda
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Password Strength Indicator
+        const passwordInput = document.getElementById('password');
+        const strengthBar = document.getElementById('passwordStrength');
+        const strengthText = document.getElementById('passwordStrengthText');
+
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+            
+            if (password.length >= 8) strength += 25;
+            if (password.length >= 12) strength += 25;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength += 25;
+            if (/[0-9]/.test(password)) strength += 15;
+            if (/[^a-zA-Z0-9]/.test(password)) strength += 10;
+            
+            strengthBar.style.width = strength + '%';
+            
+            if (strength < 25) {
+                strengthBar.style.background = '#ef4444';
+                strengthText.textContent = 'Password terlalu lemah';
+                strengthText.style.color = '#ef4444';
+            } else if (strength < 50) {
+                strengthBar.style.background = '#f59e0b';
+                strengthText.textContent = 'Password lemah';
+                strengthText.style.color = '#f59e0b';
+            } else if (strength < 75) {
+                strengthBar.style.background = '#eab308';
+                strengthText.textContent = 'Password cukup kuat';
+                strengthText.style.color = '#eab308';
+            } else {
+                strengthBar.style.background = '#22c55e';
+                strengthText.textContent = 'Password kuat!';
+                strengthText.style.color = '#22c55e';
+            }
+        });
+    </script>
+</body>
+</html>

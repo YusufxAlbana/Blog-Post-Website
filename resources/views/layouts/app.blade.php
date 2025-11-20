@@ -51,6 +51,22 @@
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
             }
+            
+            /* Navbar scroll animation */
+            .navbar-header {
+                position: sticky;
+                top: 0;
+                z-index: 40;
+                transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            }
+            .navbar-hidden {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            .navbar-visible {
+                transform: translateY(0);
+                opacity: 1;
+            }
         </style>
     </head>
     <body class="font-sans antialiased">
@@ -61,7 +77,7 @@
             <div class="lg:pl-64">
                 <!-- Page Heading -->
                 @isset($header)
-                    <header style="background: rgba(26, 26, 26, 0.95); border-bottom: 1px solid rgba(138, 43, 226, 0.2);">
+                    <header class="navbar-header navbar-visible" style="background: rgba(26, 26, 26, 0.95); border-bottom: 1px solid rgba(138, 43, 226, 0.2); backdrop-filter: blur(10px);">
                         <div class="py-6 px-6">
                             {{ $header }}
                         </div>
@@ -74,5 +90,39 @@
                 </main>
             </div>
         </div>
+        
+        <script>
+            // Navbar hide/show on scroll
+            let lastScrollTop = 0;
+            let scrollThreshold = 10; // Minimum scroll distance to trigger hide/show (reduced from 100 to 10)
+            
+            window.addEventListener('scroll', function() {
+                const navbar = document.querySelector('.navbar-header');
+                if (!navbar) return;
+                
+                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                // If at top of page, always show navbar
+                if (scrollTop <= 10) {
+                    navbar.classList.remove('navbar-hidden');
+                    navbar.classList.add('navbar-visible');
+                    lastScrollTop = scrollTop;
+                    return;
+                }
+                
+                // Check scroll direction with minimal threshold
+                if (scrollTop > lastScrollTop + 5 && scrollTop > scrollThreshold) {
+                    // Scrolling down - hide navbar
+                    navbar.classList.add('navbar-hidden');
+                    navbar.classList.remove('navbar-visible');
+                } else if (scrollTop < lastScrollTop - 5) {
+                    // Scrolling up - show navbar
+                    navbar.classList.remove('navbar-hidden');
+                    navbar.classList.add('navbar-visible');
+                }
+                
+                lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+            }, false);
+        </script>
     </body>
 </html>

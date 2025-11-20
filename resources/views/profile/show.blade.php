@@ -7,26 +7,69 @@
 
     <div class="py-12" style="background-color: var(--bg-primary);">
         <div class="px-6">
-            <!-- Profile Card -->
-            <div class="overflow-hidden shadow-sm sm:rounded-lg mb-6" style="background: rgba(30, 30, 30, 0.95); border: 1px solid rgba(138, 43, 226, 0.2);">
-                <div class="p-6">
-                    @if(auth()->id() === $user->id)
+            @if($user->isAnonymous() && auth()->id() !== $user->id)
+                <!-- Anonymous User - Restricted View -->
+                <div class="overflow-hidden shadow-sm sm:rounded-lg mb-6" style="background: rgba(30, 30, 30, 0.95); border: 1px solid rgba(138, 43, 226, 0.2);">
+                    <div class="p-12 text-center">
+                        <div class="w-32 h-32 mx-auto mb-6 rounded-full flex items-center justify-center" style="background: rgba(138, 43, 226, 0.2);">
+                            <svg class="w-16 h-16" style="color: #8A2BE2;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
+                            </svg>
+                        </div>
+                        <h1 class="text-3xl font-bold mb-4" style="color: #E0E0E0;">Anonymous User</h1>
+                        <p class="text-lg mb-2" style="color: rgba(224, 224, 224, 0.7);">This is a shared anonymous account</p>
+                        <p style="color: rgba(224, 224, 224, 0.5);">Profile information is not available for anonymous users</p>
+                    </div>
+                </div>
+            @else
+                <!-- Profile Card -->
+                <div class="overflow-hidden shadow-sm sm:rounded-lg mb-6" style="background: rgba(30, 30, 30, 0.95); border: 1px solid rgba(138, 43, 226, 0.2);">
+                    <div class="p-6">
+                        @if(auth()->id() === $user->id)
                         <!-- Edit Mode (Own Profile) -->
                         
                         <!-- Stats Section -->
                         <div class="mb-6 pb-6" style="border-bottom: 1px solid rgba(138, 43, 226, 0.2);">
-                            <div class="flex gap-6 text-sm" style="color: #9CA3AF;">
-                                <span>{{ $user->posts()->where('is_published', true)->count() }} Posts</span>
-                                <a href="{{ route('followers.list') }}" class="hover:underline transition-colors" style="color: #9CA3AF;" onmouseover="this.style.color='#8A2BE2'" onmouseout="this.style.color='#9CA3AF'">
-                                    <span id="followers-count-{{ $user->id }}">{{ $user->followersCount() }} Followers</span>
-                                </a>
-                                <a href="{{ route('following.list') }}" class="hover:underline transition-colors" style="color: #9CA3AF;" onmouseover="this.style.color='#8A2BE2'" onmouseout="this.style.color='#9CA3AF'">
-                                    {{ $user->followingCount() }} Following
-                                </a>
-                                <span>Joined {{ $user->created_at->format('F d, Y') }}</span>
-                                @if($user->role === 'admin')
-                                    <span class="px-2 py-1 rounded-full text-xs font-semibold" style="background: rgba(138, 43, 226, 0.2); color: #C084FC;">Admin</span>
-                                @endif
+                            <div class="flex justify-between items-center">
+                                <div class="flex gap-6 text-sm" style="color: #9CA3AF;">
+                                    <span>{{ $user->posts()->where('is_published', true)->count() }} Posts</span>
+                                    <a href="{{ route('followers.list') }}" class="hover:underline transition-colors" style="color: #9CA3AF;" onmouseover="this.style.color='#8A2BE2'" onmouseout="this.style.color='#9CA3AF'">
+                                        <span id="followers-count-{{ $user->id }}">{{ $user->followersCount() }} Followers</span>
+                                    </a>
+                                    <a href="{{ route('following.list') }}" class="hover:underline transition-colors" style="color: #9CA3AF;" onmouseover="this.style.color='#8A2BE2'" onmouseout="this.style.color='#9CA3AF'">
+                                        {{ $user->followingCount() }} Following
+                                    </a>
+                                    <span>Joined {{ $user->created_at->format('F d, Y') }}</span>
+                                    @if($user->role === 'admin')
+                                        <span class="px-2 py-1 rounded-full text-xs font-semibold" style="background: rgba(138, 43, 226, 0.2); color: #C084FC;">Admin</span>
+                                    @endif
+                                </div>
+                                
+                                <!-- Anonymous Mode Toggle -->
+                                <form method="POST" action="{{ route('anonymous.toggle') }}" class="inline">
+                                    @csrf
+                                    <button 
+                                        type="submit" 
+                                        class="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold transition-all"
+                                        style="{{ $user->isAnonymous() ? 'background: rgba(34, 197, 94, 0.2); color: #4ADE80; border: 1px solid rgba(34, 197, 94, 0.3);' : 'background: rgba(138, 43, 226, 0.2); color: #8A2BE2; border: 1px solid rgba(138, 43, 226, 0.3);' }}"
+                                        onmouseover="this.style.transform='translateY(-2px)'"
+                                        onmouseout="this.style.transform=''"
+                                        title="{{ $user->isAnonymous() ? 'Switch back to your real account' : 'Switch to anonymous mode' }}"
+                                    >
+                                        @if($user->isAnonymous())
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                            </svg>
+                                            <span>Exit Anonymous</span>
+                                        @else
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
+                                            </svg>
+                                            <span>Go Anonymous</span>
+                                        @endif
+                                    </button>
+                                </form>
                             </div>
                         </div>
                         
@@ -406,6 +449,9 @@
             <div class="p-4 max-h-96 overflow-y-auto" id="following-list">
                 <p class="text-center" style="color: #9CA3AF;">Loading...</p>
             </div>
+        </div>
+    </div>
+            @endif
         </div>
     </div>
 </x-app-layout>

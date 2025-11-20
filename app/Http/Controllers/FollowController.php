@@ -37,13 +37,21 @@ class FollowController extends Controller
     {
         $followingIds = auth()->user()->following()->pluck('users.id');
         
+        // Posts from people you follow
         $posts = Post::whereIn('user_id', $followingIds)
             ->where('is_published', true)
-            ->with('user')
+            ->with(['user', 'images', 'likes'])
             ->latest()
-            ->paginate(10);
+            ->get();
         
-        return view('following.index', compact('posts'));
+        // All posts for "For you" tab
+        $allPosts = Post::where('is_published', true)
+            ->with(['user', 'images', 'likes'])
+            ->latest()
+            ->take(20)
+            ->get();
+        
+        return view('following.index', compact('posts', 'allPosts'));
     }
 
     public function followingList(Request $request)

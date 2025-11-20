@@ -5,7 +5,14 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
-Route::get('/', [PostController::class, 'index'])->name('post.index');
+Route::get('/', function() {
+    if (auth()->check()) {
+        return redirect()->route('post.index');
+    }
+    return view('welcome');
+})->name('welcome');
+
+Route::get('/blog', [PostController::class, 'index'])->name('post.index');
 Route::get('/post/{post:slug}', [PostController::class, 'show'])->name('post.show');
 Route::get('/profile/{user}', [\App\Http\Controllers\ProfileViewController::class, 'show'])->name('profile.show');
 
@@ -45,6 +52,9 @@ Route::middleware('auth')->group(function () {
     })->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Anonymous mode
+    Route::post('/anonymous/toggle', [\App\Http\Controllers\AnonymousModeController::class, 'toggle'])->name('anonymous.toggle');
     
     // Messages for regular users
     Route::get('/messages', [\App\Http\Controllers\MessageController::class, 'index'])->name('messages.index');
