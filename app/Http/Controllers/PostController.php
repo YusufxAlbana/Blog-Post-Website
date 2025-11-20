@@ -8,14 +8,24 @@ use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->input('search');
+        
         $posts = Post::where('is_published', true)
             ->with('user')
+            ->when($search, function($query) use ($search) {
+                $query->where(function($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                      ->orWhereHas('user', function($userQuery) use ($search) {
+                          $userQuery->where('name', 'like', "%{$search}%");
+                      });
+                });
+            })
             ->latest()
             ->paginate(10);
 
-        return view('posts.index', compact('posts'));
+        return view('posts.index', compact('posts', 'search'));
     }
 
     public function show(Post $post)

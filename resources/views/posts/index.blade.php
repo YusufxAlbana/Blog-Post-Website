@@ -1,44 +1,75 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-bold text-2xl gradient-text" style="background: linear-gradient(135deg, var(--accent-primary), #9D4EDD); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+        <div class="flex items-center gap-4">
+            <h2 class="font-bold text-2xl gradient-text flex-shrink-0" style="background: linear-gradient(135deg, var(--accent-primary), #9D4EDD); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
                 {{ __('Blog') }}
             </h2>
-            @auth
-                <a href="{{ route('post.create') }}" style="background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);" class="inline-flex items-center px-4 py-2 text-white rounded-xl font-semibold transition-all" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(138, 43, 226, 0.5)'" onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 15px rgba(138, 43, 226, 0.3)'">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            
+            <!-- Search Bar -->
+            <form method="GET" action="{{ route('post.index') }}" class="relative flex-1">
+                <input 
+                    type="text" 
+                    name="search" 
+                    value="{{ $search ?? '' }}"
+                    placeholder="Search by title or author name..."
+                    class="w-full px-4 py-2 pr-12 rounded-xl border-0 focus:ring-2 focus:ring-purple-500 transition-all"
+                    style="background: rgba(26, 26, 26, 0.8); color: #E0E0E0; border: 1px solid rgba(138, 43, 226, 0.3);"
+                >
+                <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-all" style="color: #8A2BE2;" onmouseover="this.style.transform='translateY(-50%) scale(1.1)'" onmouseout="this.style.transform='translateY(-50%) scale(1)'">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
-                    Create Post
-                </a>
-            @endauth
+                </button>
+                @if($search)
+                    <a href="{{ route('post.index') }}" class="absolute right-12 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-all" style="color: rgba(224, 224, 224, 0.6);" onmouseover="this.style.color='#EF4444'" onmouseout="this.style.color='rgba(224, 224, 224, 0.6)'" title="Clear search">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </a>
+                @endif
+            </form>
         </div>
     </x-slot>
 
     <div class="py-6 min-h-screen" style="background-color: var(--bg-primary);">
         <div class="px-6">
-            <div class="space-y-4 fade-in">
+            <div class="flex gap-6">
+                <!-- Main Content -->
+                <div class="flex-1">
+                    @if($search)
+                        <div class="text-center mb-6">
+                            <p style="color: rgba(224, 224, 224, 0.7);">
+                                Showing results for "<span class="font-semibold" style="color: #8A2BE2;">{{ $search }}</span>"
+                            </p>
+                        </div>
+                    @endif
+
+                    <div class="space-y-4 fade-in">
                 @forelse($posts as $post)
                     <div class="overflow-hidden rounded-2xl transition-all cursor-pointer post-card" style="background: #1A1A1A; border: 1px solid rgba(138, 43, 226, 0.2);" onclick="window.location='{{ route('post.show', $post->slug) }}'">
                         <div class="p-4">
                             <div class="flex gap-3">
                                 <!-- Avatar -->
-                                <div class="flex-shrink-0">
-                                    <a href="{{ route('profile.show', $post->user) }}" class="relative" onclick="event.stopPropagation()">
+                                <div class="flex-shrink-0" style="position: relative;">
+                                    <a href="{{ route('profile.show', $post->user) }}" onclick="event.stopPropagation()" style="display: block; position: relative;">
                                         <img 
                                             src="{{ $post->user->avatar_url }}" 
                                             alt="{{ $post->user->name }}"
-                                            class="w-12 h-12 rounded-full object-cover border-2 border-gray-200 hover:border-blue-500 transition-colors"
+                                            class="w-12 h-12 rounded-full object-cover border-2 transition-colors"
+                                            style="border-color: rgba(138, 43, 226, 0.3); display: block;"
                                         >
                                         @auth
                                             @if($post->user_id != auth()->id() && !auth()->user()->isFollowing($post->user_id))
                                                 <button 
-                                                    onclick="event.stopPropagation(); followFromAvatar({{ $post->user->id }})"
+                                                    onclick="event.stopPropagation(); event.preventDefault(); followFromAvatar({{ $post->user->id }})"
                                                     id="follow-avatar-{{ $post->user->id }}"
-                                                    class="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-300 transform hover:scale-110"
+                                                    class="text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-300"
+                                                    style="position: absolute; bottom: -2px; right: -2px; width: 24px; height: 24px; background: linear-gradient(135deg, #8A2BE2, #5A189A); z-index: 10;"
+                                                    onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 4px 12px rgba(138, 43, 226, 0.6)'"
+                                                    onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.3)'"
                                                     title="Follow {{ $post->user->name }}"
                                                 >
-                                                    <svg class="w-3 h-3 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="pointer-events: none;">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path>
                                                     </svg>
                                                 </button>
@@ -147,25 +178,90 @@
                 @empty
                     <div class="overflow-hidden shadow-sm rounded-2xl" style="background: #1A1A1A; border: 1px solid rgba(138, 43, 226, 0.2);">
                         <div class="p-12 text-center">
-                            <svg class="mx-auto h-16 w-16 mb-4" style="color: rgba(138, 43, 226, 0.5);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
-                            </svg>
-                            <h3 class="text-lg font-medium mb-2" style="color: #E0E0E0;">No posts yet</h3>
-                            <p class="mb-4" style="color: rgba(224, 224, 224, 0.6);">Be the first to share something!</p>
-                            @auth
-                                <a href="{{ route('post.create') }}" class="inline-flex items-center px-4 py-2 text-white rounded-xl font-semibold transition-all" style="background: linear-gradient(135deg, #8A2BE2, #5A189A); box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(138, 43, 226, 0.5)'" onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 15px rgba(138, 43, 226, 0.3)'">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                    </svg>
-                                    Create Post
+                            @if($search)
+                                <svg class="mx-auto h-16 w-16 mb-4" style="color: rgba(138, 43, 226, 0.5);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                                <h3 class="text-lg font-medium mb-2" style="color: #E0E0E0;">No posts found</h3>
+                                <p class="mb-4" style="color: rgba(224, 224, 224, 0.6);">No posts match your search for "{{ $search }}"</p>
+                                <a href="{{ route('post.index') }}" class="inline-flex items-center px-4 py-2 text-white rounded-xl font-semibold transition-all" style="background: linear-gradient(135deg, #8A2BE2, #5A189A); box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(138, 43, 226, 0.5)'" onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 15px rgba(138, 43, 226, 0.3)'">
+                                    Clear Search
                                 </a>
-                            @endauth
+                            @else
+                                <svg class="mx-auto h-16 w-16 mb-4" style="color: rgba(138, 43, 226, 0.5);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                                </svg>
+                                <h3 class="text-lg font-medium mb-2" style="color: #E0E0E0;">No posts yet</h3>
+                                <p class="mb-4" style="color: rgba(224, 224, 224, 0.6);">Be the first to share something!</p>
+                                @auth
+                                    <a href="{{ route('post.create') }}" class="inline-flex items-center px-4 py-2 text-white rounded-xl font-semibold transition-all" style="background: linear-gradient(135deg, #8A2BE2, #5A189A); box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(138, 43, 226, 0.5)'" onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 15px rgba(138, 43, 226, 0.3)'">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                        </svg>
+                                        Create Post
+                                    </a>
+                                @endauth
+                            @endif
                         </div>
                     </div>
                 @endforelse
 
-                <div class="mt-6 flex justify-center">
-                    {{ $posts->links() }}
+                @if($posts->hasPages())
+                    <div class="mt-6 flex justify-center">
+                        {{ $posts->appends(['search' => $search])->links() }}
+                    </div>
+                @endif
+                    </div>
+                </div>
+
+                <!-- Right Sidebar - Top 5 Most Liked Posts -->
+                <div class="w-80 flex-shrink-0 hidden xl:block">
+                    <div class="sticky top-6">
+                        <div class="rounded-2xl p-6" style="background: #1A1A1A; border: 1px solid rgba(138, 43, 226, 0.2);">
+                            <h3 class="text-lg font-bold mb-4 flex items-center gap-2" style="color: #E0E0E0;">
+                                <svg class="w-5 h-5" style="color: #8A2BE2;" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                                Most Liked Posts
+                            </h3>
+                            
+                            @php
+                                $topPosts = \App\Models\Post::where('is_published', true)
+                                    ->withCount('likes')
+                                    ->orderBy('likes_count', 'desc')
+                                    ->take(5)
+                                    ->get();
+                            @endphp
+                            
+                            <div class="space-y-3">
+                                @forelse($topPosts as $index => $topPost)
+                                    <a href="{{ route('post.show', $topPost->slug) }}" class="block p-3 rounded-xl transition-all" style="background: rgba(138, 43, 226, 0.05); border: 1px solid rgba(138, 43, 226, 0.1);" onmouseover="this.style.background='rgba(138, 43, 226, 0.15)'; this.style.borderColor='rgba(138, 43, 226, 0.3)'" onmouseout="this.style.background='rgba(138, 43, 226, 0.05)'; this.style.borderColor='rgba(138, 43, 226, 0.1)'">
+                                        <div class="flex gap-3">
+                                            <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold" style="background: linear-gradient(135deg, #8A2BE2, #5A189A); color: white;">
+                                                {{ $index + 1 }}
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <h4 class="font-semibold text-sm mb-1 line-clamp-2" style="color: #E0E0E0;">
+                                                    {{ $topPost->title }}
+                                                </h4>
+                                                <div class="flex items-center gap-3 text-xs" style="color: rgba(224, 224, 224, 0.6);">
+                                                    <span>by {{ $topPost->user->name }}</span>
+                                                    <span class="flex items-center gap-1">
+                                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                                        </svg>
+                                                        {{ $topPost->likes_count }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                @empty
+                                    <p class="text-center py-4 text-sm" style="color: rgba(224, 224, 224, 0.5);">No posts yet</p>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -174,17 +270,22 @@
 
 <script>
 function followFromAvatar(userId) {
-    // Find ALL follow buttons for this user (in case they have multiple posts)
-    const allButtons = document.querySelectorAll(`[id^="follow-avatar-${userId}"]`);
+    console.log('Follow button clicked for user:', userId);
     
-    // Hide all buttons immediately
+    // Find ALL follow buttons for this user (in case they have multiple posts)
+    const allButtons = document.querySelectorAll(`#follow-avatar-${userId}`);
+    
+    console.log('Found buttons:', allButtons.length);
+    
+    // Animate all buttons immediately
     allButtons.forEach(btn => {
-        btn.style.transition = 'all 0.15s ease-out';
-        btn.style.transform = 'scale(0)';
+        btn.style.transition = 'all 0.3s ease-out';
+        btn.style.transform = 'scale(0) rotate(180deg)';
         btn.style.opacity = '0';
+        btn.disabled = true;
     });
     
-    // Send request in background
+    // Send follow request
     fetch(`/users/${userId}/follow`, {
         method: 'POST',
         headers: {
@@ -192,20 +293,33 @@ function followFromAvatar(userId) {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
-        // Remove all buttons after animation
+        console.log('✅ Follow SUCCESS:', data);
+        // Remove all buttons after animation completes
         setTimeout(() => {
-            allButtons.forEach(btn => btn.remove());
-        }, 150);
+            allButtons.forEach(btn => {
+                if (btn && btn.parentNode) {
+                    btn.remove();
+                }
+            });
+        }, 300);
     })
     .catch(error => {
-        console.error('Error:', error);
+        console.error('❌ Follow ERROR:', error);
         // Revert all buttons on error
         allButtons.forEach(btn => {
-            btn.style.transform = 'scale(1)';
+            btn.style.transform = 'scale(1) rotate(0deg)';
             btn.style.opacity = '1';
+            btn.disabled = false;
         });
+        alert('Failed to follow user. Please try again.');
     });
 }
 
@@ -255,29 +369,25 @@ function prevSlide(postId, totalImages) {
 </script>
 
 <style>
-@keyframes heartPop {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); }
+.post-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(138, 43, 226, 0.15);
+    border-color: #8A2BE2 !important;
 }
 
-.heart-pop {
-    animation: heartPop 0.3s ease-in-out;
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
 }
 
-@keyframes followPulse {
-    0%, 100% { 
-        transform: scale(1);
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
     }
-    50% { 
-        transform: scale(1.1);
-        box-shadow: 0 6px 12px rgba(59, 130, 246, 0.4);
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
-}
-
-button[id^="follow-avatar-"]:hover {
-    animation: followPulse 0.6s ease-in-out;
 }
 </style>
 

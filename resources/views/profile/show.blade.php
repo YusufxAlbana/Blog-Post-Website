@@ -17,12 +17,12 @@
                         <div class="mb-6 pb-6" style="border-bottom: 1px solid rgba(138, 43, 226, 0.2);">
                             <div class="flex gap-6 text-sm" style="color: #9CA3AF;">
                                 <span>{{ $user->posts()->where('is_published', true)->count() }} Posts</span>
-                                <button type="button" onclick="showFollowersModal()" class="hover:underline transition-colors" style="color: #9CA3AF;" onmouseover="this.style.color='#8A2BE2'" onmouseout="this.style.color='#9CA3AF'">
+                                <a href="{{ route('followers.list') }}" class="hover:underline transition-colors" style="color: #9CA3AF;" onmouseover="this.style.color='#8A2BE2'" onmouseout="this.style.color='#9CA3AF'">
                                     <span id="followers-count-{{ $user->id }}">{{ $user->followersCount() }} Followers</span>
-                                </button>
-                                <button type="button" onclick="showFollowingModal()" class="hover:underline transition-colors" style="color: #9CA3AF;" onmouseover="this.style.color='#8A2BE2'" onmouseout="this.style.color='#9CA3AF'">
+                                </a>
+                                <a href="{{ route('following.list') }}" class="hover:underline transition-colors" style="color: #9CA3AF;" onmouseover="this.style.color='#8A2BE2'" onmouseout="this.style.color='#9CA3AF'">
                                     {{ $user->followingCount() }} Following
-                                </button>
+                                </a>
                                 <span>Joined {{ $user->created_at->format('F d, Y') }}</span>
                                 @if($user->role === 'admin')
                                     <span class="px-2 py-1 rounded-full text-xs font-semibold" style="background: rgba(138, 43, 226, 0.2); color: #C084FC;">Admin</span>

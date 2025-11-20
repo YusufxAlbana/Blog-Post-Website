@@ -1,13 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl leading-tight" style="color: #E0E0E0;">
-                {{ __('My Posts') }}
-            </h2>
-            <a href="{{ route('post.create') }}" class="px-4 py-2 text-white rounded-lg font-semibold transition-all" style="background: linear-gradient(135deg, #8A2BE2, #5A189A); box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(138, 43, 226, 0.5)'" onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 15px rgba(138, 43, 226, 0.3)'">
-                Create New Post
-            </a>
-        </div>
+        <h2 class="font-semibold text-xl leading-tight" style="color: #E0E0E0;">
+            {{ __('My Posts') }}
+        </h2>
     </x-slot>
 
     <div class="py-12" style="background-color: var(--bg-primary);">

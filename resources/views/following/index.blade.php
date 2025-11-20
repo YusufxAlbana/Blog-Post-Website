@@ -13,13 +13,31 @@
                         <div class="p-4">
                             <div class="flex gap-3">
                                 <!-- Avatar -->
-                                <div class="flex-shrink-0">
-                                    <a href="{{ route('profile.show', $post->user) }}" class="relative" onclick="event.stopPropagation()">
+                                <div class="flex-shrink-0" style="position: relative;">
+                                    <a href="{{ route('profile.show', $post->user) }}" onclick="event.stopPropagation()" style="display: block; position: relative;">
                                         <img 
                                             src="{{ $post->user->avatar_url }}" 
                                             alt="{{ $post->user->name }}"
-                                            class="w-12 h-12 rounded-full object-cover border-2 border-gray-200 hover:border-blue-500 transition-colors"
+                                            class="w-12 h-12 rounded-full object-cover border-2 transition-colors"
+                                            style="border-color: rgba(138, 43, 226, 0.3); display: block;"
                                         >
+                                        @auth
+                                            @if($post->user_id != auth()->id() && !auth()->user()->isFollowing($post->user_id))
+                                                <button 
+                                                    onclick="event.stopPropagation(); event.preventDefault(); followFromAvatar({{ $post->user->id }})"
+                                                    id="follow-avatar-{{ $post->user->id }}"
+                                                    class="text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-300"
+                                                    style="position: absolute; bottom: -2px; right: -2px; width: 24px; height: 24px; background: linear-gradient(135deg, #8A2BE2, #5A189A); z-index: 10;"
+                                                    onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 4px 12px rgba(138, 43, 226, 0.6)'"
+                                                    onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.3)'"
+                                                    title="Follow {{ $post->user->name }}"
+                                                >
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="pointer-events: none;">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path>
+                                                    </svg>
+                                                </button>
+                                            @endif
+                                        @endauth
                                     </a>
                                 </div>
                                 
@@ -145,6 +163,55 @@
 </x-app-layout>
 
 <script>
+// Follow function
+function followFromAvatar(userId) {
+    console.log('Follow button clicked for user:', userId);
+    
+    const allButtons = document.querySelectorAll(`#follow-avatar-${userId}`);
+    console.log('Found buttons:', allButtons.length);
+    
+    allButtons.forEach(btn => {
+        btn.style.transition = 'all 0.3s ease-out';
+        btn.style.transform = 'scale(0) rotate(180deg)';
+        btn.style.opacity = '0';
+        btn.disabled = true;
+    });
+    
+    fetch(`/users/${userId}/follow`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('✅ Follow SUCCESS:', data);
+        setTimeout(() => {
+            allButtons.forEach(btn => {
+                if (btn && btn.parentNode) {
+                    btn.remove();
+                }
+            });
+        }, 300);
+    })
+    .catch(error => {
+        console.error('❌ Follow ERROR:', error);
+        allButtons.forEach(btn => {
+            btn.style.transform = 'scale(1) rotate(0deg)';
+            btn.style.opacity = '1';
+            btn.disabled = false;
+        });
+        alert('Failed to follow user. Please try again.');
+    });
+}
+
 // Carousel for following page
 const carouselStates = {};
 
@@ -253,5 +320,20 @@ function togglePostLikeIndex(postId) {
     transform: translateY(-4px);
     box-shadow: 0 20px 40px rgba(138, 43, 226, 0.15);
     border-color: #8A2BE2 !important;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 </style>

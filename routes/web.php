@@ -52,6 +52,8 @@ Route::middleware('auth')->group(function () {
     // Follow routes
     Route::post('/users/{user}/follow', [\App\Http\Controllers\FollowController::class, 'toggle'])->name('user.follow');
     Route::get('/following', [\App\Http\Controllers\FollowController::class, 'following'])->name('following.index');
+    Route::get('/following/list', [\App\Http\Controllers\FollowController::class, 'followingList'])->name('following.list');
+    Route::get('/followers/list', [\App\Http\Controllers\FollowController::class, 'followersList'])->name('followers.list');
     
     // Like routes - SEPARATED (using ID not slug)
     Route::post('/posts/{id}/like', [\App\Http\Controllers\PostLikeController::class, 'toggle'])->name('post.like')->where('id', '[0-9]+');
@@ -63,6 +65,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/inbox/{user}', [\App\Http\Controllers\DirectMessageController::class, 'store'])->name('dm.store');
     Route::patch('/dm/messages/{message}', [\App\Http\Controllers\DirectMessageController::class, 'update'])->name('dm.message.update');
     Route::delete('/dm/messages/{message}', [\App\Http\Controllers\DirectMessageController::class, 'destroy'])->name('dm.message.destroy');
+    
+    // Groups
+    Route::get('/groups', [\App\Http\Controllers\GroupController::class, 'index'])->name('groups.index');
+    Route::get('/groups/create', [\App\Http\Controllers\GroupController::class, 'create'])->name('groups.create');
+    Route::post('/groups', [\App\Http\Controllers\GroupController::class, 'store'])->name('groups.store');
+    Route::get('/groups/{group}', [\App\Http\Controllers\GroupController::class, 'show'])->name('groups.show');
+    Route::post('/groups/{group}/messages', [\App\Http\Controllers\GroupController::class, 'sendMessage'])->name('groups.sendMessage');
+    Route::post('/groups/{group}/members', [\App\Http\Controllers\GroupController::class, 'addMembers'])->name('groups.addMembers');
+    Route::get('/groups/{group}/search-members', [\App\Http\Controllers\GroupController::class, 'searchMembers'])->name('groups.searchMembers');
     
     // Message management routes
     Route::patch('/messages/{message}', [\App\Http\Controllers\MessageManagementController::class, 'update'])->name('message.update');

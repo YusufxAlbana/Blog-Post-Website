@@ -57,6 +57,12 @@ class Post extends Model
         return $this->hasMany(PostLike::class);
     }
 
+    // Alias for postLikes
+    public function likes()
+    {
+        return $this->postLikes();
+    }
+
     public function isLikedBy($user): bool
     {
         if (!$user) return false;

@@ -45,4 +45,32 @@ class FollowController extends Controller
         
         return view('following.index', compact('posts'));
     }
+
+    public function followingList(Request $request)
+    {
+        $search = $request->input('search');
+        
+        $following = auth()->user()->following()
+            ->when($search, function($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%");
+            })
+            ->paginate(20);
+        
+        return view('following.list', compact('following', 'search'));
+    }
+
+    public function followersList(Request $request)
+    {
+        $search = $request->input('search');
+        
+        $followers = auth()->user()->followers()
+            ->when($search, function($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%");
+            })
+            ->paginate(20);
+        
+        return view('followers.list', compact('followers', 'search'));
+    }
 }

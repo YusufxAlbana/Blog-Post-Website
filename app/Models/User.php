@@ -95,4 +95,27 @@ class User extends Authenticatable
     {
         return $this->following()->count();
     }
+
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class, 'group_members')
+            ->withPivot('is_admin')
+            ->withTimestamps();
+    }
+
+    public function createdGroups()
+    {
+        return $this->hasMany(Group::class, 'created_by');
+    }
+
+    public function mutualFollowers()
+    {
+        // Users who follow me AND I follow them back
+        return $this->followers()
+            ->whereIn('users.id', function($query) {
+                $query->select('following_id')
+                    ->from('follows')
+                    ->where('follower_id', $this->id);
+            });
+    }
 }

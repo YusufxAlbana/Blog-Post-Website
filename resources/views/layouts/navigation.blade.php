@@ -23,7 +23,7 @@
             @auth
                 <a href="{{ route('dm.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all {{ request()->routeIs('dm.*') ? 'bg-purple' : '' }}" style="{{ request()->routeIs('dm.*') ? 'background: rgba(138, 43, 226, 0.2); color: #8A2BE2;' : 'color: #E0E0E0;' }}" onmouseover="if(!this.classList.contains('bg-purple')) this.style.background='rgba(138, 43, 226, 0.1)'" onmouseout="if(!this.classList.contains('bg-purple')) this.style.background=''">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                     </svg>
                     <span class="font-semibold">Inbox</span>
                 </a>
@@ -58,7 +58,7 @@
                 @else
                     <a href="{{ route('messages.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all {{ request()->routeIs('messages.index') ? 'bg-purple' : '' }}" style="{{ request()->routeIs('messages.index') ? 'background: rgba(138, 43, 226, 0.2); color: #8A2BE2;' : 'color: #E0E0E0;' }}" onmouseover="if(!this.classList.contains('bg-purple')) this.style.background='rgba(138, 43, 226, 0.1)'" onmouseout="if(!this.classList.contains('bg-purple')) this.style.background=''">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                         </svg>
                         <span class="font-semibold">Messages</span>
                     </a>
@@ -72,6 +72,18 @@
                 </a>
             @endauth
         </nav>
+
+        <!-- Create Post Button -->
+        @auth
+            <div class="p-4">
+                <a href="{{ route('post.create') }}" class="flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold transition-all" style="background: linear-gradient(135deg, #8A2BE2, #5A189A); color: white; box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(138, 43, 226, 0.5)'" onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 15px rgba(138, 43, 226, 0.3)'">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    <span>Create Post</span>
+                </a>
+            </div>
+        @endauth
 
         <!-- Profile Section at Bottom -->
         <div class="p-4 border-t" style="border-color: rgba(138, 43, 226, 0.2);">
