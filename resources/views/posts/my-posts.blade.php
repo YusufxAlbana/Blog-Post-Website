@@ -1,8 +1,59 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl leading-tight" style="color: #E0E0E0;">
-            {{ __('My Posts') }}
-        </h2>
+        <div class="flex items-center justify-between">
+            <h2 class="font-semibold text-xl leading-tight" style="color: #E0E0E0;">
+                {{ __('My Posts') }}
+            </h2>
+            <x-info-button id="MyPosts" title="About My Posts" modal-title="My Posts" subtitle="Manage Your Content">
+                <div>
+                    <h3 class="text-xl font-bold mb-3" style="color: #E0E0E0;">Kelola Postingan Anda</h3>
+                    <p style="color: #9CA3AF; line-height: 1.6;">
+                        Halaman ini menampilkan semua postingan yang telah Anda buat. Anda dapat mengedit, menghapus, atau melihat statistik dari setiap postingan.
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold mb-3" style="color: #E0E0E0;">Fitur My Posts</h3>
+                    <div class="space-y-3">
+                        <div class="flex gap-3">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center" style="background: rgba(138, 43, 226, 0.2);">
+                                <svg class="w-4 h-4" style="color: #8A2BE2;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1" style="color: #E0E0E0;">Edit Post</h4>
+                                <p class="text-sm" style="color: #9CA3AF;">Ubah judul, konten, atau gambar postingan Anda kapan saja</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center" style="background: rgba(138, 43, 226, 0.2);">
+                                <svg class="w-4 h-4" style="color: #8A2BE2;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1" style="color: #E0E0E0;">Delete Post</h4>
+                                <p class="text-sm" style="color: #9CA3AF;">Hapus postingan yang tidak Anda inginkan lagi</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center" style="background: rgba(138, 43, 226, 0.2);">
+                                <svg class="w-4 h-4" style="color: #8A2BE2;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1" style="color: #E0E0E0;">View Statistics</h4>
+                                <p class="text-sm" style="color: #9CA3AF;">Lihat jumlah likes dan komentar pada setiap postingan</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </x-info-button>
+        </div>
     </x-slot>
 
     <div class="py-12" style="background-color: var(--bg-primary);">

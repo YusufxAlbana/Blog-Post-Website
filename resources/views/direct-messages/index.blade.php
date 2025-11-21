@@ -4,18 +4,69 @@
             <h2 class="font-semibold text-xl leading-tight" style="color: #E0E0E0;">
                 {{ __('Inbox') }}
             </h2>
-            <a 
-                href="{{ route('groups.create') }}" 
-                class="inline-flex items-center px-4 py-2 text-white rounded-xl font-semibold transition-all"
-                style="background: linear-gradient(135deg, #8A2BE2, #5A189A); box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);"
-                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(138, 43, 226, 0.5)'"
-                onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 15px rgba(138, 43, 226, 0.3)'"
-            >
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            <div class="flex items-center gap-3">
+                <a 
+                    href="{{ route('groups.create') }}" 
+                    class="inline-flex items-center px-4 py-2 text-white rounded-xl font-semibold transition-all"
+                    style="background: linear-gradient(135deg, #8A2BE2, #5A189A); box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);"
+                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(138, 43, 226, 0.5)'"
+                    onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 15px rgba(138, 43, 226, 0.3)'"
+                >
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
                 Create Group
             </a>
+            <x-info-button id="Inbox" title="About Inbox" modal-title="Inbox" subtitle="Direct Messaging">
+                <div>
+                    <h3 class="text-xl font-bold mb-3" style="color: #E0E0E0;">Direct Messaging</h3>
+                    <p style="color: #9CA3AF; line-height: 1.6;">
+                        Inbox adalah tempat untuk berkomunikasi secara pribadi dengan user lain. Anda dapat mengirim pesan teks, berbagi pemikiran, atau berdiskusi secara private.
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold mb-3" style="color: #E0E0E0;">Fitur Inbox</h3>
+                    <div class="space-y-3">
+                        <div class="flex gap-3">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center" style="background: rgba(138, 43, 226, 0.2);">
+                                <svg class="w-4 h-4" style="color: #8A2BE2;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1" style="color: #E0E0E0;">Private Chat</h4>
+                                <p class="text-sm" style="color: #9CA3AF;">Kirim pesan pribadi ke user lain secara one-on-one</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center" style="background: rgba(138, 43, 226, 0.2);">
+                                <svg class="w-4 h-4" style="color: #8A2BE2;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1" style="color: #E0E0E0;">Group Chat</h4>
+                                <p class="text-sm" style="color: #9CA3AF;">Buat grup untuk diskusi dengan banyak user sekaligus</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center" style="background: rgba(138, 43, 226, 0.2);">
+                                <svg class="w-4 h-4" style="color: #8A2BE2;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1" style="color: #E0E0E0;">Edit & Delete</h4>
+                                <p class="text-sm" style="color: #9CA3AF;">Edit atau hapus pesan yang sudah dikirim</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </x-info-button>
+            </div>
         </div>
     </x-slot>
 

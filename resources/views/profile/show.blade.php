@@ -1,8 +1,59 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl leading-tight" style="color: #E0E0E0;">
-            {{ auth()->id() === $user->id ? 'My Profile' : $user->name . "'s Profile" }}
-        </h2>
+        <div class="flex items-center justify-between">
+            <h2 class="font-semibold text-xl leading-tight" style="color: #E0E0E0;">
+                {{ auth()->id() === $user->id ? 'My Profile' : $user->name . "'s Profile" }}
+            </h2>
+            <x-info-button id="Profile" title="About Profile" modal-title="Profile" subtitle="Your Identity">
+                <div>
+                    <h3 class="text-xl font-bold mb-3" style="color: #E0E0E0;">Tentang Profile</h3>
+                    <p style="color: #9CA3AF; line-height: 1.6;">
+                        Halaman Profile menampilkan informasi tentang user, termasuk bio, avatar, dan statistik aktivitas. Anda dapat mengedit profile Anda sendiri atau melihat profile user lain.
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold mb-3" style="color: #E0E0E0;">Fitur Profile</h3>
+                    <div class="space-y-3">
+                        <div class="flex gap-3">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center" style="background: rgba(138, 43, 226, 0.2);">
+                                <svg class="w-4 h-4" style="color: #8A2BE2;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1" style="color: #E0E0E0;">Edit Profile</h4>
+                                <p class="text-sm" style="color: #9CA3AF;">Ubah avatar, nama, bio, dan informasi lainnya</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center" style="background: rgba(138, 43, 226, 0.2);">
+                                <svg class="w-4 h-4" style="color: #8A2BE2;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1" style="color: #E0E0E0;">View Statistics</h4>
+                                <p class="text-sm" style="color: #9CA3AF;">Lihat jumlah posts, followers, dan following</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center" style="background: rgba(138, 43, 226, 0.2);">
+                                <svg class="w-4 h-4" style="color: #8A2BE2;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1" style="color: #E0E0E0;">Send Message</h4>
+                                <p class="text-sm" style="color: #9CA3AF;">Kirim pesan langsung ke user lain dari profile mereka</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </x-info-button>
+        </div>
     </x-slot>
 
     <div class="py-12" style="background-color: var(--bg-primary);">
