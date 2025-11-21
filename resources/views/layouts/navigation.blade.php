@@ -63,6 +63,13 @@
                     </svg>
                     <span class="font-semibold">Feedback</span>
                 </a>
+
+                <a href="{{ route('information.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all {{ request()->routeIs('information.*') ? 'bg-purple' : '' }}" style="{{ request()->routeIs('information.*') ? 'background: rgba(138, 43, 226, 0.2); color: #8A2BE2;' : 'color: #E0E0E0;' }}" onmouseover="if(!this.classList.contains('bg-purple')) this.style.background='rgba(138, 43, 226, 0.1)'" onmouseout="if(!this.classList.contains('bg-purple')) this.style.background=''">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span class="font-semibold">Information</span>
+                </a>
             @endauth
         </nav>
 

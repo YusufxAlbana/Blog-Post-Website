@@ -15,6 +15,7 @@ Route::get('/', function() {
 Route::get('/blog', [PostController::class, 'index'])->name('post.index');
 Route::get('/post/{post:slug}', [PostController::class, 'show'])->name('post.show');
 Route::get('/profile/{user}', [\App\Http\Controllers\ProfileViewController::class, 'show'])->name('profile.show');
+Route::get('/information', [\App\Http\Controllers\InformationController::class, 'index'])->name('information.index');
 
 // Test route for debugging likes
 Route::get('/test-like', function() {
