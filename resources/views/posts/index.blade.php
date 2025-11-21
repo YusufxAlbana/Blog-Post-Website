@@ -165,6 +165,7 @@
                                                 src="{{ $post->user->avatar_url }}" 
                                                 alt="{{ $post->user->name }}"
                                                 class="w-5 h-5 rounded-full object-cover"
+                                                style="{{ $post->user->isAnonymous() ? 'padding: 2px; background: linear-gradient(135deg, #8A2BE2, #5A189A);' : '' }}"
                                             >
                                             <p class="text-xs truncate" style="color: #6B7280;">{{ $post->user->name }}</p>
                                         </div>

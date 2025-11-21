@@ -109,6 +109,7 @@
                                         src="{{ $otherUser->avatar_url }}" 
                                         alt="{{ $otherUser->name }}"
                                         class="w-14 h-14 rounded-full object-cover"
+                                        style="{{ $otherUser->isAnonymous() ? 'padding: 4px; background: linear-gradient(135deg, #8A2BE2, #5A189A);' : '' }}"
                                         style="border: 2px solid rgba(138, 43, 226, 0.5);"
                                     >
                                     @if($unreadCount > 0)

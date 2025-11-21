@@ -25,7 +25,7 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                     </svg>
-                    <span class="font-semibold">Inbox</span>
+                    <span class="font-semibold">Messages</span>
                 </a>
 
                 <a href="{{ route('post.myPosts') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all {{ request()->routeIs('post.myPosts') ? 'bg-purple' : '' }}" style="{{ request()->routeIs('post.myPosts') ? 'background: rgba(138, 43, 226, 0.2); color: #8A2BE2;' : 'color: #E0E0E0;' }}" onmouseover="if(!this.classList.contains('bg-purple')) this.style.background='rgba(138, 43, 226, 0.1)'" onmouseout="if(!this.classList.contains('bg-purple')) this.style.background=''">
@@ -53,7 +53,7 @@
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                         </svg>
-                        <span class="font-semibold">Messages</span>
+                        <span class="font-semibold">Inbox</span>
                     </a>
                 @endif
 
@@ -86,7 +86,7 @@
                         src="{{ Auth::user()->avatar_url }}" 
                         alt="{{ Auth::user()->name }}"
                         class="w-10 h-10 rounded-full object-cover"
-                        style="border: 2px solid rgba(138, 43, 226, 0.5);"
+                        style="border: 2px solid rgba(138, 43, 226, 0.5); {{ Auth::user()->isAnonymous() ? 'padding: 4px; background: linear-gradient(135deg, #8A2BE2, #5A189A);' : '' }}"
                     >
                     <div class="flex-1 min-w-0">
                         <div class="font-semibold truncate">{{ Auth::user()->name }}</div>

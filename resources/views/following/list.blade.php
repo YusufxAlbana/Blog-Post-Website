@@ -38,6 +38,7 @@
                                         src="{{ $user->avatar_url }}" 
                                         alt="{{ $user->name }}"
                                         class="w-14 h-14 rounded-full object-cover border-2 transition-colors"
+                                        style="border-color: rgba(138, 43, 226, 0.5); {{ $user->isAnonymous() ? 'padding: 4px; background: linear-gradient(135deg, #8A2BE2, #5A189A);' : '' }}"
                                         style="border-color: rgba(138, 43, 226, 0.3);"
                                     >
                                 </a>

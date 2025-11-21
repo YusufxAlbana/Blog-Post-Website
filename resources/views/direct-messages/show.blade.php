@@ -10,6 +10,7 @@
                 src="{{ $otherUser->avatar_url }}" 
                 alt="{{ $otherUser->name }}"
                 class="w-10 h-10 rounded-full object-cover"
+                style="{{ $otherUser->isAnonymous() ? 'padding: 4px; background: linear-gradient(135deg, #8A2BE2, #5A189A);' : '' }}"
                 style="border: 2px solid rgba(138, 43, 226, 0.5);"
             >
             <div>
@@ -41,6 +42,7 @@
                                         src="{{ $message->sender->avatar_url }}" 
                                         alt="{{ $message->sender->name }}"
                                         class="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                                        style="{{ $message->sender->isAnonymous() ? 'padding: 2px; background: linear-gradient(135deg, #8A2BE2, #5A189A);' : '' }}"
                                         style="border: 1px solid rgba(138, 43, 226, 0.3);"
                                     >
                                     <div class="relative">

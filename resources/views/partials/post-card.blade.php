@@ -8,7 +8,7 @@
                         src="{{ $post->user->avatar_url }}" 
                         alt="{{ $post->user->name }}"
                         class="w-12 h-12 rounded-full object-cover border-2 transition-colors"
-                        style="border-color: rgba(138, 43, 226, 0.3); display: block;"
+                        style="border-color: rgba(138, 43, 226, 0.3); display: block; {{ $post->user->isAnonymous() ? 'padding: 4px; background: linear-gradient(135deg, #8A2BE2, #5A189A);' : '' }}"
                     >
                     @auth
                         @if($post->user_id != auth()->id() && !auth()->user()->isFollowing($post->user_id))

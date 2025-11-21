@@ -9,14 +9,26 @@
                     <!-- Avatar -->
                     @if($msg->user)
                         <a href="{{ route('profile.show', $msg->user) }}">
-                            <img 
-                                src="{{ $msg->user->avatar_url }}" 
-                                alt="{{ $msg->user->name }}"
-                                class="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
-                            >
+                            @if($msg->user->email === 'anonymous@system.local')
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center border-2" style="border-color: rgba(138, 43, 226, 0.5); background: linear-gradient(135deg, #8A2BE2, #5A189A); padding: 6px;">
+                                    <img 
+                                        src="{{ asset('assets/logo.png') }}?v={{ time() }}" 
+                                        alt="Anonymous Logo"
+                                        class="w-full h-full object-contain"
+                                        style="filter: drop-shadow(0 1px 3px rgba(255, 255, 255, 0.3));"
+                                    >
+                                </div>
+                            @else
+                                <img 
+                                    src="{{ $msg->user->avatar_url }}" 
+                                    alt="{{ $msg->user->name }}"
+                                    class="w-10 h-10 rounded-full object-cover border-2"
+                                    style="border-color: rgba(138, 43, 226, 0.5);"
+                                >
+                            @endif
                         </a>
                     @else
-                        <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-semibold">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold" style="background: linear-gradient(135deg, #8A2BE2, #5A189A);">
                             {{ substr($msg->name ?? 'A', 0, 1) }}
                         </div>
                     @endif
@@ -122,7 +134,7 @@
     </div>
 
     <!-- Message Form -->
-    <form wire:submit.prevent="send" class="space-y-4" id="message-form" onsubmit="sendInstantMessage(event)">
+    <form wire:submit.prevent="send" class="space-y-4" id="message-form">
         @guest
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -209,12 +221,20 @@
         messageDiv.className = 'p-4 rounded-lg';
         messageDiv.style.cssText = 'background: rgba(40, 40, 40, 0.8); border: 1px solid rgba(138, 43, 226, 0.15); opacity: 0; transform: translateY(20px); transition: all 0.3s ease;';
         
+        // Check if user is anonymous
+        const isAnonymous = '{{ auth()->check() && auth()->user()->isAnonymous() ? "true" : "false" }}' === 'true';
+        const logoUrl = '{{ asset("assets/logo.png") }}';
+        
         messageDiv.innerHTML = `
             <div class="flex gap-3 mb-2">
-                ${userAvatar ? `
-                    <img src="${userAvatar}" alt="${userName}" class="w-10 h-10 rounded-full object-cover border-2 border-gray-200">
+                ${userAvatar ? (isAnonymous ? `
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center border-2" style="border-color: rgba(138, 43, 226, 0.5); background: linear-gradient(135deg, #8A2BE2, #5A189A); padding: 6px;">
+                        <img src="${logoUrl}" alt="${userName}" class="w-full h-full object-contain" style="filter: drop-shadow(0 1px 3px rgba(255, 255, 255, 0.3));">
+                    </div>
                 ` : `
-                    <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-semibold">
+                    <img src="${userAvatar}" alt="${userName}" class="w-10 h-10 rounded-full object-cover border-2" style="border-color: rgba(138, 43, 226, 0.5);">
+                `) : `
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold" style="background: linear-gradient(135deg, #8A2BE2, #5A189A);">
                         ${userName.charAt(0)}
                     </div>
                 `}

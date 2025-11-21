@@ -56,8 +56,14 @@ class User extends Authenticatable
 
     public function getAvatarUrlAttribute(): string
     {
+        // If user has uploaded avatar, use it
         if ($this->avatar) {
             return asset('storage/' . $this->avatar);
+        }
+        
+        // Anonymous users get the BLOGMOUS logo as avatar
+        if ($this->isAnonymous()) {
+            return asset('assets/logo.png');
         }
         
         // Default avatar using UI Avatars
